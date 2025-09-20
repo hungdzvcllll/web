@@ -27,5 +27,5 @@ public class VipUser {
     private Integer payValue;
     @ManyToOne(cascade = CascadeType.ALL)
     private User user;
-
+    
 }
