@@ -31,6 +31,7 @@ public class User {
     private String role;
     private String loginBy;
     private String password;
+    private Boolean registered;
     private String resetPasswordCode;
     private LocalDateTime resetPasswordExpired;
     private String confirmRegisterCode;

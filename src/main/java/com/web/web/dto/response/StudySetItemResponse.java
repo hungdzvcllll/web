@@ -8,4 +8,5 @@ public class StudySetItemResponse {
     private String concept;
     private String define;
     private Integer studySetId;
+    private String imageSource;
 }

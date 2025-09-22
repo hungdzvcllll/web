@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StudySetRequest {
     private String name;
-    private Integer foderId;
+    private Integer folderId;
 }

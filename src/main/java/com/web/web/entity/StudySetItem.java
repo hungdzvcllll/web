@@ -19,6 +19,7 @@ public class StudySetItem {
     private Integer id;
     private String concept;
     private String define;
+    private String imageSource;
     @ManyToOne()
     private StudySet studySet;
 }

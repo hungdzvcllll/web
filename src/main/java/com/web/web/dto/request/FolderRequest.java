@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class FolderRequest {
     private String name;
     private Boolean isPrivate;
+    private Integer classId;
 }
 
