@@ -13,4 +13,5 @@ public class TestResponse {
     private String link;
     private Integer successPercent;
     private Integer studySetId;
+    private Integer userId;
 }

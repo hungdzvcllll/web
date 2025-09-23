@@ -44,4 +44,6 @@ public class User {
     private List<UserInClass> userInClasss=new ArrayList<UserInClass>();
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<Notification> notifications=new ArrayList<Notification>();
+     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    List<Test> tests=new ArrayList<Test>();
 }

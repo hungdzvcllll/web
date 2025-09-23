@@ -21,5 +21,7 @@ public class Test {
     private String link;
     private Integer successPercent;
     @ManyToOne()
+    User user;
+    @ManyToOne()
     StudySet studySet;
 }

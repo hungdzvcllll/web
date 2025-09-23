@@ -22,5 +22,6 @@ public interface TestMapper {
         return ss; 
     }    
     @Mapping(target="studySetId",source="studySet.id")
+    @Mapping(target="userId",source="user.id")
     public TestResponse toDTO(Test t);
 }
