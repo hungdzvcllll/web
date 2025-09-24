@@ -1,8 +1,12 @@
 package com.web.web.mapper;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import com.web.web.dto.request.ClassRequest;
 import com.web.web.dto.request.UserInClassRequest;
 import com.web.web.dto.response.UserInClassResponse;
 import com.web.web.entity.UserInClass;
@@ -12,7 +16,8 @@ import com.web.web.entity.User;
 public interface UserInClassMapper{
     @Mapping(source="classId",target="classs")
     @Mapping(source="userId",target="user")
-    public UserInClass toEntity(UserInClassRequest uicr);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntityFromDto(UserInClassRequest dto, @MappingTarget UserInClass entity);
     default Class mapClass(Integer id){
         if(id==null)
             return null;

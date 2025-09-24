@@ -1,9 +1,12 @@
 package com.web.web.mapper;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-
+import com.web.web.dto.request.ClassRequest;
 import com.web.web.dto.request.TestRequest;
 
 import com.web.web.dto.response.TestResponse;
@@ -12,8 +15,9 @@ import com.web.web.entity.Test;
 
 @Mapper
 public interface TestMapper {
-     @Mapping(target="studySet",source="studySetId")
-    public Test toEntity(TestRequest tr);
+    @Mapping(target="studySet",source="studySetId")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntityFromDto(TestRequest dto, @MappingTarget Test entity);
     default StudySet mapStudySet(Integer id){
         if(id==null)
             return null;
