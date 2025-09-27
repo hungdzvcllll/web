@@ -1,5 +1,6 @@
 package com.web.web.security;
 
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,7 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,37 +29,37 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
 import java.util.List;
 
 @Configuration
+@EnableMethodSecurity
 @EnableWebSecurity
-public class SoftwareSecurity {
+public class SoftwareSecurity implements WebMvcConfigurer {
     @Autowired
     JwtFilter jwtFilter;
     @Autowired
     MyUserDetailService accountService;
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ Correct
-                .csrf(csrf -> csrf.disable()) // Tắt CSRF vì dùng JWT
+                .csrf(csrf->csrf.disable())    
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/",
-                                 "/dang_ky", "/xac_nhan_dang_ky","/signin","/reset_password","/confirm_reset_password","/getThongTin",
-                        "getChinhSach")
+                .authorizeHttpRequests(auth->auth
+                        .requestMatchers("/user/signin","/user/register","/user/confirmRegister","/user/resetPassword",
+                        "/user/confirmResetPassword")
                         .permitAll()
-                        .requestMatchers("huyMa","themMa","xacNhanNhanHang","themSanPham","xoaSanPham","thong_tin", "chinh_sach"
-                        ,"/TongDoanhThu","/doanhThuSanPham","/AllspThuocDonHang","/fulldanhsachdonhang").hasAuthority("Chu")
-                        //.requestMatchers("abc").hasAnyAuthority("KhachHang")
+                        .requestMatchers("/user/findById" ,"/user/findAll").hasRole("ADMIN")
                         .anyRequest().authenticated())
-
+                    .csrf(AbstractHttpConfigurer::disable)
                 // .formLogin((form) -> form
                 // .loginPage("/login")
                 // .usernameParameter("ten")
@@ -69,29 +72,31 @@ public class SoftwareSecurity {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new MyUserDetailService();
-    }
-   
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
+    AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager(); // Quản lý xác thực
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    UserDetailsService userDetailsService() {
+        return new MyUserDetailService();
+    }
+
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
-     @Bean
-    public AuthenticationProvider authenticationProvider() {
+
+    @Bean
+    AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(accountService); // Sử dụng service quản lý user
         authenticationProvider.setPasswordEncoder(passwordEncoder()); // Sử dụng mã hóa mật khẩu
         return authenticationProvider;
     }
+
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",            // ✅ thêm dòng này để test local

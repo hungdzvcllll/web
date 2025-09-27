@@ -10,7 +10,7 @@ import com.web.web.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User,Integer> {
     public User findByUsernameAndRegistered(String username,Boolean registered);
-    public User findByEmailAndRegisteredAndConfirmRegisterCode(String email,Boolean registered,String code);
+    public User findByUsernameAndRegisteredAndConfirmRegisterCode(String email,Boolean registered,String code);
     public User findByEmailAndRegistered(String email,Boolean registered);
     public User findByUsername(String username);
     public User findByEmail(String email);

@@ -12,8 +12,9 @@ public interface UserServiceInterface {
     public void confirmRegister(String username,String registerCode);
     public User findCurrentUser();
     public UserResponse responseTofindCurrentUser();
-    public void resetPassword(String username);
+    public User resetPassword(String username);
     public void updateYourProfile(UserRequest ur);
     public UserResponse findById(Integer id);
     public Page<UserResponse> findAll(Pageable pageable);
+        public void confirmReset(String name,String code,String password);
 }

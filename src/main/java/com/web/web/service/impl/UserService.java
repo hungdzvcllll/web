@@ -31,20 +31,25 @@ public class UserService implements UserServiceInterface{
     @Autowired
     UserMapper mapper;
     public void register(UserRequest ur){
-        if(userRepo.findByUsername(ur.getUsername())!=null)
-            throw new RuntimeException("please try another username");
-        if(userRepo.findByEmailAndRegistered(ur.getEmail(),true)!=null)
-            throw new RuntimeException("please try another email");
+
+        //if(userRepo.findByEmailAndRegistered(ur.getEmail(),true)!=null)
+            //throw new RuntimeException("please try another email");
+        User us=userRepo.findByUsername(ur.getUsername());
+        if(us!=null&&us.getRegistered()==true)
+            throw new RuntimeException("please change your username");
+        
         String registerCode=UUID.randomUUID().toString();
         LocalDateTime registerExpired=LocalDateTime.now().plusHours(1);
         String password=pe.encode(ur.getPassword());
-        User u=new User(null,ur.getUsername(),ur.getEmail(),"USER","NORMAL",password,false,null,null,registerCode,
+        User u=new User(null,ur.getUsername(),ur.getEmail(),"ROLE_USER","NORMAL",password,false,null,null,registerCode,
         registerExpired,null,null,null,null,null);
         userRepo.save(u);
+        if(us!=null)
+            u.setId(us.getId());
         sender.sendEmail("registerCode:"+registerCode,ur.getEmail());
     }
     public void confirmRegister(String username,String registerCode){
-        User u=userRepo.findByUsernameAndRegistered(username,false);
+        User u=userRepo.findByUsernameAndRegisteredAndConfirmRegisterCode(username,false,registerCode);
         if(u==null||u.getConfirmRegisterExpired().isBefore(LocalDateTime.now()))
             throw new RuntimeException("code or username not true or code expired");
         u.setRegistered(true);
@@ -60,7 +65,7 @@ public class UserService implements UserServiceInterface{
     public UserResponse responseTofindCurrentUser(){
         return mapper.toDTO(findCurrentUser());
     }
-    public void resetPassword(String username){
+    public User resetPassword(String username){
         User u=userRepo.findByUsernameAndRegistered(username, true);
         if(u==null)
             throw new RuntimeException("user didn't register or not exist");
@@ -68,8 +73,19 @@ public class UserService implements UserServiceInterface{
         LocalDateTime resetExpired=LocalDateTime.now().plusHours(1);
         u.setResetPasswordCode(resetCode);
         u.setResetPasswordExpired(resetExpired);
-        userRepo.save(u);
         sender.sendEmail("resetPasswordCode:"+resetCode,u.getEmail());
+        System.out.println(u.getResetPasswordCode());
+        return userRepo.save(u);
+        
+    }
+    public void confirmReset(String name,String code,String password){
+        User u=userRepo.findByUsernameAndRegistered(name, true);
+        if(u==null)
+            throw new RuntimeException("user didn't register or not exist");
+        if(u.getResetPasswordCode().equals(code)==false)
+            throw new RuntimeException("code not true");
+        u.setPassword(pe.encode(password));
+        userRepo.save(u);
     }
     public void updateYourProfile(UserRequest ur){
         User u=findCurrentUser();
@@ -78,6 +94,7 @@ public class UserService implements UserServiceInterface{
         if(userRepo.findByEmailAndRegistered(ur.getEmail(),true)!=null&&ur.getEmail().equals(u.getEmail())==false)
             throw new RuntimeException("please try another email"); 
         mapper.updateEntityFromDto(ur,u);
+        u.setPassword(pe.encode(u.getPassword()));
         this.userRepo.save(u);
     }
     public UserResponse findById(Integer id){
