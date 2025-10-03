@@ -10,5 +10,8 @@ import lombok.NoArgsConstructor;
 public class AccessFolderResponse {
     private Integer userId;
     private Integer folderId;
+    private String username;
+    private String folderName;
+    private String folderLink;
     private String role;
 }

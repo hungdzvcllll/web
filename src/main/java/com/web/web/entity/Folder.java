@@ -26,7 +26,6 @@ public class Folder {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
     private String name;
-    private String link;
     private Boolean isPrivate;
     @ManyToOne()
     @JoinColumn(nullable = true)

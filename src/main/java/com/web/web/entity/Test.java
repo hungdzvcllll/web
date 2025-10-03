@@ -18,7 +18,7 @@ public class Test {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
-    private String link;
+   
     private Integer successPercent;
     @ManyToOne()
     User user;

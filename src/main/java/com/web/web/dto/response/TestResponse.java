@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class TestResponse {
     private Integer id;
     private String name;
-    private String link;
     private Integer successPercent;
     private Integer studySetId;
     private Integer userId;

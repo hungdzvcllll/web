@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 public class StudySetResponse {
     private Integer id;
     private String name;
-    private String link;
     private Integer folderId;
 }

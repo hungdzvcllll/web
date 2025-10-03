@@ -23,7 +23,6 @@ public class StudySet {
     @GeneratedValue(strategy =GenerationType.IDENTITY)
     private Integer id;
     private String name;
-    private String link;
     @ManyToOne()
     private Folder folder;
     @OneToMany(mappedBy="studySet",cascade=CascadeType.ALL)

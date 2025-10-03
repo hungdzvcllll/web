@@ -11,7 +11,7 @@ import com.web.web.dto.request.FolderRequest;
 import com.web.web.dto.response.FolderResponse;
 import com.web.web.entity.Folder;
 import com.web.web.entity.Class;
-@Mapper
+@Mapper(componentModel = "spring")
 public interface FolderMapper {
     @Mapping(target="belongToClass",source="classId")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

@@ -22,9 +22,7 @@ public class Class {
     @Id
     @GeneratedValue(strategy =GenerationType.IDENTITY)
     Integer id;
-    String name;
-    String link;
-    Boolean isPrivate;
+    String  name;
     @OneToMany(mappedBy="belongToClass",cascade=CascadeType.ALL)
     private List<Folder> folders=new ArrayList<Folder>();
     @OneToMany(mappedBy="classs",cascade=CascadeType.ALL)

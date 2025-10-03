@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class FolderResponse {
     private Integer id;
     private String name;
-    private String link;
     private Boolean isPrivate;
     private Integer classId;
 }

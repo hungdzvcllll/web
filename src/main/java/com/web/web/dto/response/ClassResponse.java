@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 public class ClassResponse {
     private Integer id;
     private String name;
-    private String link;
     private Boolean isPrivate;
 }

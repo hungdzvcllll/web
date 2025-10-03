@@ -1,5 +1,6 @@
 package com.web.web.entity.embedId;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import jakarta.persistence.Embeddable;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccessFolderId {
+public class AccessFolderId implements Serializable {
     private Integer userId;
     private Integer folderId;
     @Override
