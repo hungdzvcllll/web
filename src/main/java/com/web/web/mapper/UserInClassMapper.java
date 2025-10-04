@@ -12,7 +12,7 @@ import com.web.web.dto.response.UserInClassResponse;
 import com.web.web.entity.UserInClass;
 import com.web.web.entity.Class;
 import com.web.web.entity.User;
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserInClassMapper{
     @Mapping(source="classId",target="classs")
     @Mapping(source="userId",target="user")
@@ -34,5 +34,7 @@ public interface UserInClassMapper{
     }
     @Mapping(source="classs.id",target="classId")
     @Mapping(source="user.id",target="userId")
+    @Mapping(source="user.username",target="username")
+    @Mapping(source="classs.name",target="className")
     public UserInClassResponse toDTO(UserInClass uic);
 }

@@ -45,11 +45,11 @@ public class AccessFolderService {
         Folder folder=folderRepo.findById(folderId).get();
         User u=userService.findCurrentUser();
         AccessFolder af=acRepo.findByUserAndFolderAndRole(u,folder,"CREATE");
-            if(af==null)
-                throw new RuntimeException("You don't have permission with this folder");
+        if(af==null)
+            throw new RuntimeException("You don't have permission with this folder");
         return folder;
     }
-
+    
     public Page<AccessFolderResponse> yourFolder(Pageable pageable) {
         User u=userService.findCurrentUser();
         
@@ -69,6 +69,8 @@ public class AccessFolderService {
             throw new RuntimeException("User not exist");
         if(u.getId()==userService.findCurrentUser().getId())
             throw new RuntimeException("can't invite yourself");
+        if(acRepo.findByUserAndFolder(u,folder)!=null)
+             throw new RuntimeException("user existed");
         AccessFolder access=new AccessFolder(new AccessFolderId(),u,folder,"INVITE");
         acRepo.save(access);
         notiService.saveNotification(u, "you was invite to use folder "+folder.getName());

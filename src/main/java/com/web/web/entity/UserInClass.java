@@ -24,5 +24,4 @@ public class UserInClass {
     @MapsId("classId")
     private Class classs;
     private String role;
-    private String status;
 }

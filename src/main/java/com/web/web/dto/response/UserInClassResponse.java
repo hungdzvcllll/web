@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserInClassResponse {
     private String role;
-    private String status;
     private Integer userId;
+    private String username;
     private Integer classId;
+    private String className;
 }

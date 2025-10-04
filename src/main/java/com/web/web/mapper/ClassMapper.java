@@ -8,7 +8,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import com.web.web.dto.request.ClassRequest;
 import com.web.web.dto.response.ClassResponse;
 import com.web.web.entity.Class;
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ClassMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntityFromDto(ClassRequest dto, @MappingTarget Class entity);
