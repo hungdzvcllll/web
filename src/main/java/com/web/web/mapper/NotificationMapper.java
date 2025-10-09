@@ -12,7 +12,7 @@ import com.web.web.dto.response.NotificationResponse;
 import com.web.web.entity.Notification;
 import com.web.web.entity.User;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface NotificationMapper {
     @Mapping(target="user",source="userId")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

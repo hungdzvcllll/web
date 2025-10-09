@@ -11,4 +11,5 @@ public class StudySetResponse {
     private Integer id;
     private String name;
     private Integer folderId;
+    private String folderName;
 }

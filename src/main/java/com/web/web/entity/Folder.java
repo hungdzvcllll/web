@@ -34,4 +34,7 @@ public class Folder {
     List<AccessFolder> accessFolders=new ArrayList<AccessFolder>();
     @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL)
     List<StudySet> studySets=new ArrayList<StudySet>();
+    public Folder(Integer id){
+        this.id=id;
+    }
 }

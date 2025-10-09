@@ -13,7 +13,7 @@ import com.web.web.dto.response.TestResponse;
 import com.web.web.entity.StudySet;
 import com.web.web.entity.Test;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface TestMapper {
     @Mapping(target="studySet",source="studySetId")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

@@ -12,9 +12,9 @@ import com.web.web.dto.response.StudySetResponse;
 import com.web.web.entity.Folder;
 import com.web.web.entity.StudySet;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface StudySetMapper {
-    @Mapping(source="folderId",target="folder")
+    //@Mapping(source="folderId",target="folder")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntityFromDto(StudySetRequest dto, @MappingTarget StudySet entity);
     default Folder mapFolder(Integer id){
@@ -25,5 +25,6 @@ public interface StudySetMapper {
         return f; 
     }
     @Mapping(source="folder.id",target="folderId")
+    @Mapping(source="folder.name",target="folderName")
     public StudySetResponse toDTO(StudySet ss);
 }

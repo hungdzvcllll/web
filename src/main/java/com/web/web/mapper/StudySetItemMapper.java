@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.web.web.dto.request.ClassRequest;
 import com.web.web.dto.request.StudySetItemRequest;
@@ -15,10 +16,13 @@ import com.web.web.dto.response.TestResponse;
 import com.web.web.entity.StudySet;
 import com.web.web.entity.StudySetItem;
 import com.web.web.entity.Test;
+import com.web.web.repository.StudySetRepository;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface StudySetItemMapper {
-    @Mapping(target="studySet",source="studySetId")
+    //@Autowired
+    //public static final StudySetRepository repo;
+    //@Mapping(target="studySet",source="studySetId")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntityFromDto(StudySetItemRequest dto, @MappingTarget StudySetItem entity);
     default StudySet mapStudySet(Integer id){
@@ -29,5 +33,5 @@ public interface StudySetItemMapper {
         return ss; 
     }    
     @Mapping(target="studySetId",source="studySet.id")
-    public TestResponse toDTO(Test t);
+    public StudySetItemResponse toDTO(StudySetItem t);
 }
