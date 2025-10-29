@@ -57,10 +57,11 @@ public class SoftwareSecurity implements WebMvcConfigurer {
                         .requestMatchers("/user/signin","/user/register","/user/confirmRegister","/user/resetPassword",
                         "/user/confirmResetPassword")
                         .permitAll()
-                        .requestMatchers("/user/findById" ,"/user/findAll").hasRole("ADMIN")
+                        .requestMatchers("/user/findById" ,"/user/findAll","/vipUser/findAll").hasRole("ADMIN")
+                        .requestMatchers("/textBook/add","/Chapter/save","/Chapter/update").hasRole("EXPERT")
                         .anyRequest().authenticated())
                     .csrf(AbstractHttpConfigurer::disable)
-                // .formLogin((form) -> form
+                // .formLogin((form) -> formj
                 // .loginPage("/login")
                 // .usernameParameter("ten")
                 // .permitAll())

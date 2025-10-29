@@ -13,10 +13,11 @@ import com.web.web.service.impl.AccessFolderService;
 
 @RestController
 @RequestMapping("/accessFolder")
+//AccessFolder lưu trữ các tài khoản có thể truy cập folder nếu folder không thuộc class và private
 public class AccessFolderController {
     @Autowired
     AccessFolderService accessService;
-    @PostMapping("/invite")
+    @PostMapping("/invite")//mời người dùng khác sử dụng folder
     public ResponseEntity<?> invite(@RequestParam("userId")Integer userId,@RequestParam("folderId")Integer folderId){   
         try{
             accessService.inviteUserFolder(userId,folderId);
@@ -27,7 +28,7 @@ public class AccessFolderController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-    @GetMapping("/yourFolders")
+    @GetMapping("/yourFolders")//danh sách folder của bạn(tự tạo hoặc được mời)
     public ResponseEntity<?> yourFolders(Pageable pageable){
          try{
            

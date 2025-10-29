@@ -8,5 +8,6 @@ import com.web.web.entity.VipUser;
 @Mapper(componentModel = "spring")
 public interface VipUserMapper {
     @Mapping(target="userId",source="user.id")
+    @Mapping(target="userName",source="user.username")
     public VipUserResponse toDTO(VipUser vu);
 }

@@ -19,10 +19,11 @@ import com.web.web.service.impl.StudySetItemService;
 
 @RestController
 @RequestMapping("/item")
+//StudySetItem là các cặp khái niệm và định nghĩa
 public class StudySetItemController {
     @Autowired
     StudySetItemService service;
-    @PostMapping("/add")
+    @PostMapping("/add")//thêm
     public ResponseEntity<?>create(@ModelAttribute("request") StudySetItemRequest request,
     @RequestParam("studySetId")Integer studySetId){
         try{
@@ -34,7 +35,7 @@ public class StudySetItemController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete")//xóa dựa trên id
     public ResponseEntity<?>delete(@RequestParam("studySetId")Integer studySetId){
         try{
             service.deleteItems(studySetId);
@@ -44,7 +45,7 @@ public class StudySetItemController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-    @PutMapping("/update")
+    @PutMapping("/update")//update
     public ResponseEntity<?> update(@ModelAttribute StudySetItemRequest request,@RequestParam("id")Integer id){
          try{
             service.update(request, id);
@@ -54,10 +55,19 @@ public class StudySetItemController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-    @GetMapping("/findByStudySet")
+    @GetMapping("/findByStudySet")//tìm theo StudySet
     public ResponseEntity<?> findByStudySet(@RequestParam("studySetId")Integer studySetId,Pageable pageable){
          try{
             return ResponseEntity.ok(service.findByStudySet(studySetId, pageable));
+        }
+        catch(Exception e){
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
+    }
+    @GetMapping("/findById")// tìm theo id
+    public ResponseEntity<?> findById(@RequestParam("id")Integer id){
+         try{
+            return ResponseEntity.ok(service.findById(id));
         }
         catch(Exception e){
             return ResponseEntity.status(400).body(e.getMessage());

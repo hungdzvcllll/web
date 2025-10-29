@@ -13,4 +13,6 @@ public class VipUserResponse {
     private LocalDateTime expired;
     private Integer payValue;
     private Integer userId;
+    private String userName;
+    private String locale;
 }

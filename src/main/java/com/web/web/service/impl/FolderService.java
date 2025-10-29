@@ -46,7 +46,7 @@ public class FolderService {
         null,null);
         folderRepo.save(folder);
     }
-    public void updateFolder(Integer id,String name,Boolean isPrivate){
+     public void updateFolder(Integer id,String name,Boolean isPrivate){
         afService.checkCreate(id);
         Folder folder=folderRepo.findById(id).get();
         if(folder==null)
@@ -57,6 +57,7 @@ public class FolderService {
         folder.setIsPrivate(isPrivate);
         folderRepo.save(folder);
     }
+    
     public Page<FolderResponse> findClassFolder(Integer classId,Pageable pageable){
         Class classs=classRepo.findById(classId).get();
         uInClassService.checkIfYouAreInClass(classs);
@@ -77,6 +78,7 @@ public class FolderService {
         checkIfYouCanAccessFolder(id);
         return folderMapper.toDTO(folderRepo.findById(id).get());
     }
+    
     public Page<FolderResponse> findPublicByName(String name,Pageable pageable){
         return folderRepo.findByIsPrivateAndName(false,name,pageable).map(folderMapper::toDTO);
     }

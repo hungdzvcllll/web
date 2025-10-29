@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.web.web.service.impl.NotificationService;
 
 @RestController
-@RequestMapping("/notification")
+@RequestMapping("/notification")//thông báo
 public class NotificationController {
     @Autowired
     NotificationService service;
-    @GetMapping("/yourNoti")
+    @GetMapping("/yourNoti")//thông báo của bạn
     public ResponseEntity<?>yourNoti(Pageable pageable){
         try{
              return ResponseEntity.ok(service.yourNotification(pageable));

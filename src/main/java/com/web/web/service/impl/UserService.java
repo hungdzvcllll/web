@@ -42,7 +42,7 @@ public class UserService implements UserServiceInterface{
         LocalDateTime registerExpired=LocalDateTime.now().plusHours(1);
         String password=pe.encode(ur.getPassword());
         User u=new User(null,ur.getUsername(),ur.getEmail(),"ROLE_USER","NORMAL",password,false,null,null,registerCode,
-        registerExpired,null,null,null,null,null);
+        registerExpired,null,null,null,null,null, null);
         userRepo.save(u);
         if(us!=null)
             u.setId(us.getId());

@@ -41,19 +41,16 @@ public class UserController {
     JwtService jwtService;
     @Autowired
     UserService userService;
-    @PostMapping("/signin")//ten và matKhau
+    @PostMapping("/signin")//login
     public ResponseEntity<?> login(@RequestBody UserRequest us) {
         try {
-            // Xác thực thông tin đăng nhập
+            
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             us.getUsername(),
                             us.getPassword()));
 
-            // Nếu xác thực thành công, tạo token và trả về
-
-
-            // Nếu xác thực thành công
+           
             if (authentication.isAuthenticated()) {
                 // Lấy thông tin Account từ đối tượng xác thực
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -81,7 +78,8 @@ public class UserController {
                     .body("An error occurred: " + e.getMessage());
         }
     }
-    @PostMapping("/register")
+    @PostMapping("/register")//đăng ký,nhập username , password,email,sau khi gửi về server thì sẽ nhận email thông báo 
+                             //mã để xác nhận đăng ký
     public ResponseEntity<?>register(@RequestBody UserRequest request){
         try{
             userService.register(request);
@@ -91,7 +89,7 @@ public class UserController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-    @PutMapping("/confirmRegister")
+    @PutMapping("/confirmRegister") //xác nhận đăng ký
     public ResponseEntity<?>confirmRegister(@RequestParam("username") String username,@RequestParam("registerCode") String registerCode){
         try{
             userService.confirmRegister(username,registerCode);
@@ -101,7 +99,7 @@ public class UserController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-    @PutMapping("/resetPassword")
+    @PutMapping("/resetPassword")//reset password
     public ResponseEntity<?> resetPassword(@RequestParam("username") String username){
         try{
             userService.resetPassword(username);
@@ -111,7 +109,7 @@ public class UserController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-    @PutMapping("/confirmResetPassword")
+    @PutMapping("/confirmResetPassword")//xác nhận mã reset
     public ResponseEntity<?> confirmResetPassword(@RequestParam("username") String username,@RequestParam("code") String code,
     @RequestParam("newPassword") String newPassword){
         try{
@@ -122,7 +120,7 @@ public class UserController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-    @PutMapping("/update")
+    @PutMapping("/update")//update thông tin bản thân,gồm esername,password hay email
     public ResponseEntity<?> update(@RequestBody UserRequest request){
         try{
             userService.updateYourProfile(request);
@@ -132,7 +130,7 @@ public class UserController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-    @GetMapping("/yourProfile")
+    @GetMapping("/yourProfile")//thông tin tài khoản của bản thân
     public ResponseEntity<?> yourProfile(){
         try{
             return ResponseEntity.ok(userService.responseTofindCurrentUser());
@@ -141,7 +139,7 @@ public class UserController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-    @GetMapping("/findById/{id}")
+    @GetMapping("/findById/{id}")//tìm tài khoản người dùng theo id(chỉ dành cho admin)
     public ResponseEntity<?> findById(@PathVariable("id") Integer id){
         try{
             return ResponseEntity.ok(userService.findById(id));
@@ -150,7 +148,7 @@ public class UserController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-    @GetMapping("/findAll")
+    @GetMapping("/findAll")//xem toàn bộ danh sách tài khoản(chỉ admin)
     public ResponseEntity<?> findAll(Pageable pageable){
         try{
             return ResponseEntity.ok(userService.findAll(pageable));

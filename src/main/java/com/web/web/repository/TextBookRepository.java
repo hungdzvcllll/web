@@ -5,10 +5,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.web.web.entity.StudySet;
-import com.web.web.entity.Test;
+import com.web.web.entity.TextBook;
 
 @Repository
-public interface TestRepository extends JpaRepository<Test,Integer>{
-    public Page<Test> findByStudySet(StudySet set,Pageable pageable);
+public interface TextBookRepository extends JpaRepository<TextBook,Integer> {
+    public Page<TextBook> findAll(Pageable pageable);
 }

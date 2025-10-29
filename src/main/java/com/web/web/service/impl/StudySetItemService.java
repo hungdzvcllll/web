@@ -62,5 +62,8 @@ public class StudySetItemService {
         folderService.checkIfYouCanAccessFolder(set.getFolder().getId());
         return itemRepo.findByStudySet(set,pageable).map(mapper::toDTO);
     }
+    public StudySetItemResponse findById(Integer id){
+        return mapper.toDTO(itemRepo.findById(id).get());
+    }
     
 }
