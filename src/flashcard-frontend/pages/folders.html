@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư mục của tôi - FlashCard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="navbar-container"></div>
+    <div id="sidebar-container"></div>
+    
+    <main class="main-content">
+        <div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+                <nav class="breadcrumb-custom"><ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="dashboard.html">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Thư mục</li>
+                </ol></nav>
+                <h1>Thư mục của tôi</h1>
+                <p>Quản lý các thư mục chứa bộ học liệu của bạn</p>
+            </div>
+            <button class="btn btn-primary-custom" onclick="showCreateFolderModal()">
+                <i class="fas fa-plus me-2"></i>Tạo thư mục
+            </button>
+        </div>
+        
+        <div class="card-custom mb-4">
+            <div class="card-body">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0" id="search-input" placeholder="Tìm kiếm thư mục...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="filter-role">
+                            <option value="">Tất cả</option>
+                            <option value="CREATE">Tạo bởi tôi</option>
+                            <option value="INVITE">Được mời</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="btn-group w-100">
+                            <button type="button" class="btn btn-outline-secondary active" id="view-grid"><i class="fas fa-th-large"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" id="view-list"><i class="fas fa-list"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="folders-container" class="row g-4">
+            <div class="col-12"><div class="loading-spinner"><div class="spinner"></div></div></div>
+        </div>
+        <div id="pagination-container" class="mt-4"></div>
+    </main>
+    
+    <div class="modal fade modal-custom" id="createFolderModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tạo thư mục mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="create-folder-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="folder-name" class="form-label">Tên thư mục</label>
+                            <input type="text" class="form-control" id="folder-name" placeholder="Nhập tên thư mục" required>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="folder-private" checked>
+                            <label class="form-check-label" for="folder-private"><i class="fas fa-lock me-1"></i> Riêng tư</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary-custom"><i class="fas fa-plus me-1"></i> Tạo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+    
+    <script>
+        let createFolderModal, currentPage = 0, viewMode = 'grid', allFolders = [];
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!Utils.requireAuth()) return;
+            createFolderModal = new bootstrap.Modal(document.getElementById('createFolderModal'));
+            await loadFolders();
+            setupEventListeners();
+        });
+        
+        async function loadFolders(page = 0) {
+            const container = document.getElementById('folders-container');
+            container.innerHTML = '<div class="col-12"><div class="loading-spinner"><div class="spinner"></div></div></div>';
+            try {
+                const response = await API.getYourFolders(page, 12);
+                allFolders = response.content || [];
+                currentPage = page;
+                renderFolders(allFolders);
+                Utils.renderPagination('#pagination-container', page, response.totalPages, loadFolders);
+            } catch (error) {
+                container.innerHTML = '<div class="col-12"><p class="text-center text-muted">Không thể tải dữ liệu</p></div>';
+            }
+        }
+        
+        function renderFolders(folders) {
+            const container = document.getElementById('folders-container');
+            const filterRole = document.getElementById('filter-role').value;
+            const searchQuery = document.getElementById('search-input').value.toLowerCase();
+            
+            let filtered = folders.filter(f => {
+                const matchRole = !filterRole || f.role === filterRole;
+                const matchSearch = !searchQuery || f.folderName.toLowerCase().includes(searchQuery);
+                return matchRole && matchSearch;
+            });
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-12"><div class="empty-state">
+                    <div class="empty-state-icon"><i class="fas fa-folder-open"></i></div>
+                    <h3>Chưa có thư mục nào</h3>
+                    <p>Tạo thư mục đầu tiên để bắt đầu</p>
+                    <button class="btn btn-primary-custom" onclick="showCreateFolderModal()"><i class="fas fa-plus me-1"></i> Tạo thư mục</button>
+                </div></div>`;
+                return;
+            }
+            
+            if (viewMode === 'grid') {
+                container.innerHTML = filtered.map(f => `
+                    <div class="col-sm-6 col-lg-4 col-xl-3">
+                        <div class="card-custom folder-card h-100" onclick="location.href='folder-detail.html?id=${f.folderId}'">
+                            <div class="card-body">
+                                <span class="badge ${f.role === 'CREATE' ? 'badge-primary' : 'badge-success'} folder-badge">${f.role === 'CREATE' ? 'Của tôi' : 'Được mời'}</span>
+                                <div class="folder-icon"><i class="fas fa-folder"></i></div>
+                                <h5 class="folder-name">${Utils.escapeHtml(f.folderName)}</h5>
+                                <p class="folder-count"><i class="fas fa-layer-group me-1"></i> Bộ học liệu</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = `<div class="col-12"><div class="card-custom"><div class="list-group list-group-flush">
+                    ${filtered.map(f => `<a href="folder-detail.html?id=${f.folderId}" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="folder-icon me-3" style="width:45px;height:45px;"><i class="fas fa-folder"></i></div>
+                        <div class="flex-grow-1"><h6 class="mb-0">${Utils.escapeHtml(f.folderName)}</h6><small class="text-muted">${f.role === 'CREATE' ? 'Tạo bởi bạn' : 'Được mời'}</small></div>
+                        <span class="badge ${f.role === 'CREATE' ? 'badge-primary' : 'badge-success'}">${f.role === 'CREATE' ? 'Của tôi' : 'Được mời'}</span>
+                    </a>`).join('')}
+                </div></div></div>`;
+            }
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('search-input').addEventListener('input', Utils.debounce(() => renderFolders(allFolders), 300));
+            document.getElementById('filter-role').addEventListener('change', () => renderFolders(allFolders));
+            document.getElementById('view-grid').addEventListener('click', function() {
+                viewMode = 'grid'; this.classList.add('active'); document.getElementById('view-list').classList.remove('active'); renderFolders(allFolders);
+            });
+            document.getElementById('view-list').addEventListener('click', function() {
+                viewMode = 'list'; this.classList.add('active'); document.getElementById('view-grid').classList.remove('active'); renderFolders(allFolders);
+            });
+            document.getElementById('create-folder-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const name = document.getElementById('folder-name').value.trim();
+                const isPrivate = document.getElementById('folder-private').checked;
+                if (!name) { Utils.error('Vui lòng nhập tên'); return; }
+                try {
+                    await API.createPersonalFolder(name, isPrivate);
+                    Utils.success('Tạo thư mục thành công!');
+                    createFolderModal.hide();
+                    document.getElementById('folder-name').value = '';
+                    loadFolders(currentPage);
+                } catch (error) { Utils.error(error.message || 'Lỗi'); }
+            });
+        }
+        
+        function showCreateFolderModal() { createFolderModal.show(); }
+    </script>
+</body>
+</html>

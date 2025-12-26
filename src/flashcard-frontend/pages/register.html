@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - FlashCard</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="../index.html" class="text-white text-decoration-none">
+                    <i class="fas fa-layer-group fa-2x mb-3"></i>
+                </a>
+                <h1>Đăng ký tài khoản</h1>
+                <p>Tạo tài khoản để bắt đầu học</p>
+            </div>
+            
+            <div class="auth-body">
+                <!-- Register Form -->
+                <form id="register-form">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Tên đăng nhập</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-user text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" id="username" 
+                                   placeholder="Nhập tên đăng nhập" required minlength="3">
+                        </div>
+                        <div class="form-text">Tối thiểu 3 ký tự</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-envelope text-muted"></i>
+                            </span>
+                            <input type="email" class="form-control border-start-0" id="email" 
+                                   placeholder="example@email.com" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mật khẩu</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-lock text-muted"></i>
+                            </span>
+                            <input type="password" class="form-control border-start-0 border-end-0" 
+                                   id="password" placeholder="Nhập mật khẩu" required minlength="6">
+                            <span class="input-group-text bg-light border-start-0" 
+                                  id="toggle-password" style="cursor: pointer;">
+                                <i class="fas fa-eye text-muted"></i>
+                            </span>
+                        </div>
+                        <div class="form-text">Tối thiểu 6 ký tự</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="confirm-password" class="form-label">Xác nhận mật khẩu</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-lock text-muted"></i>
+                            </span>
+                            <input type="password" class="form-control border-start-0" 
+                                   id="confirm-password" placeholder="Nhập lại mật khẩu" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-check mb-4">
+                        <input type="checkbox" class="form-check-input" id="agree-terms" required>
+                        <label class="form-check-label" for="agree-terms">
+                            Tôi đồng ý với <a href="#">Điều khoản sử dụng</a> và <a href="#">Chính sách bảo mật</a>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100" id="register-btn">
+                        <span class="btn-text">Đăng ký</span>
+                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                    </button>
+                </form>
+                
+                <!-- Confirm Form (hidden by default) -->
+                <form id="confirm-form" class="d-none">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-envelope-open-text fa-3x text-primary mb-3"></i>
+                        <h5>Kiểm tra email của bạn</h5>
+                        <p class="text-muted small">Chúng tôi đã gửi mã xác nhận đến email <strong id="confirm-email"></strong></p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="confirm-code" class="form-label">Mã xác nhận</label>
+                        <input type="text" class="form-control form-control-lg text-center" 
+                               id="confirm-code" placeholder="Nhập mã xác nhận" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100" id="confirm-btn">
+                        <span class="btn-text">Xác nhận</span>
+                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                    </button>
+                    
+                    <div class="text-center mt-3">
+                        <a href="#" id="resend-code" class="text-decoration-none">Gửi lại mã xác nhận</a>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="auth-footer">
+                <p class="mb-0">Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Config & API -->
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Redirect if already logged in
+            if (API.isLoggedIn()) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            
+            let registeredUsername = '';
+            
+            // Toggle password visibility
+            const togglePassword = document.getElementById('toggle-password');
+            const passwordInput = document.getElementById('password');
+            
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+            
+            // Register form submit
+            const registerForm = document.getElementById('register-form');
+            const registerBtn = document.getElementById('register-btn');
+            
+            registerForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                // Validation
+                if (username.length < 3) {
+                    Utils.error('Tên đăng nhập phải có ít nhất 3 ký tự');
+                    return;
+                }
+                
+                if (!Utils.isValidEmail(email)) {
+                    Utils.error('Email không hợp lệ');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    Utils.error('Mật khẩu phải có ít nhất 6 ký tự');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    Utils.error('Mật khẩu xác nhận không khớp');
+                    return;
+                }
+                
+                // Show loading
+                registerBtn.disabled = true;
+                registerBtn.querySelector('.btn-text').classList.add('d-none');
+                registerBtn.querySelector('.spinner-border').classList.remove('d-none');
+                
+                try {
+                    await API.register(username, password, email);
+                    Utils.success('Đăng ký thành công! Vui lòng kiểm tra email để lấy mã xác nhận.');
+                    
+                    // Show confirm form
+                    registeredUsername = username;
+                    document.getElementById('confirm-email').textContent = email;
+                    registerForm.classList.add('d-none');
+                    document.getElementById('confirm-form').classList.remove('d-none');
+                    
+                } catch (error) {
+                    Utils.error(error.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+                } finally {
+                    registerBtn.disabled = false;
+                    registerBtn.querySelector('.btn-text').classList.remove('d-none');
+                    registerBtn.querySelector('.spinner-border').classList.add('d-none');
+                }
+            });
+            
+            // Confirm form submit
+            const confirmForm = document.getElementById('confirm-form');
+            const confirmBtn = document.getElementById('confirm-btn');
+            
+            confirmForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const code = document.getElementById('confirm-code').value.trim();
+                
+                if (!code) {
+                    Utils.error('Vui lòng nhập mã xác nhận');
+                    return;
+                }
+                
+                // Show loading
+                confirmBtn.disabled = true;
+                confirmBtn.querySelector('.btn-text').classList.add('d-none');
+                confirmBtn.querySelector('.spinner-border').classList.remove('d-none');
+                
+                try {
+                    await API.confirmRegister(registeredUsername, code);
+                    Utils.success('Xác nhận thành công! Đang chuyển đến trang đăng nhập...');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+                    
+                } catch (error) {
+                    Utils.error(error.message || 'Mã xác nhận không đúng hoặc đã hết hạn');
+                } finally {
+                    confirmBtn.disabled = false;
+                    confirmBtn.querySelector('.btn-text').classList.remove('d-none');
+                    confirmBtn.querySelector('.spinner-border').classList.add('d-none');
+                }
+            });
+            
+            // Resend code
+            document.getElementById('resend-code').addEventListener('click', async function(e) {
+                e.preventDefault();
+                Utils.info('Chức năng gửi lại mã đang được phát triển');
+            });
+        });
+    </script>
+    
+    <style>
+        .input-group-text {
+            border: 2px solid var(--gray-200);
+        }
+        .input-group .form-control {
+            border: 2px solid var(--gray-200);
+        }
+        .input-group .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: none;
+        }
+        .input-group:focus-within .input-group-text {
+            border-color: var(--primary-color);
+        }
+    </style>
+</body>
+</html>

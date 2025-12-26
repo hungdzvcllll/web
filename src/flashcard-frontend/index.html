@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashCard - Học tập thông minh</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/style.css" rel="stylesheet">
+    
+    <style>
+        .hero-section {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .hero-content { position: relative; z-index: 1; }
+        .hero-title { font-size: 3.5rem; font-weight: 700; color: white; margin-bottom: 1.5rem; line-height: 1.2; }
+        .hero-subtitle { font-size: 1.25rem; color: rgba(255,255,255,0.9); margin-bottom: 2rem; line-height: 1.6; }
+        .hero-buttons .btn { padding: 0.875rem 2rem; font-weight: 600; border-radius: 50px; margin-right: 1rem; margin-bottom: 1rem; }
+        
+        .btn-light-custom { background: white; color: #667eea; border: none; }
+        .btn-light-custom:hover { background: #f8f9fa; color: #5a4fcf; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .btn-outline-light-custom { background: transparent; color: white; border: 2px solid white; }
+        .btn-outline-light-custom:hover { background: white; color: #667eea; }
+        
+        .hero-image { position: relative; z-index: 1; }
+        .hero-card { background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 30px 60px rgba(0,0,0,0.2); transform: perspective(1000px) rotateY(-10deg) rotateX(5deg); transition: transform 0.5s ease; }
+        .hero-card:hover { transform: perspective(1000px) rotateY(0) rotateX(0); }
+        
+        .floating-card { position: absolute; background: white; border-radius: 15px; padding: 1rem 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.15); animation: float 3s ease-in-out infinite; }
+        .floating-card-1 { top: 10%; right: -10%; animation-delay: 0s; }
+        .floating-card-2 { bottom: 20%; left: -5%; animation-delay: 1s; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        .features-section { padding: 6rem 0; background: white; }
+        .section-title { font-size: 2.5rem; font-weight: 700; color: var(--dark-color); margin-bottom: 1rem; }
+        .section-subtitle { font-size: 1.1rem; color: var(--gray-500); margin-bottom: 3rem; }
+        
+        .feature-card { text-align: center; padding: 2rem; border-radius: var(--radius-xl); transition: all var(--transition-normal); height: 100%; }
+        .feature-card:hover { background: var(--gray-100); transform: translateY(-5px); }
+        .feature-icon { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; }
+        .feature-icon.purple { background: rgba(124,58,237,0.1); color: #7c3aed; }
+        .feature-icon.blue { background: rgba(59,130,246,0.1); color: #3b82f6; }
+        .feature-icon.green { background: rgba(16,185,129,0.1); color: #10b981; }
+        .feature-icon.orange { background: rgba(249,115,22,0.1); color: #f97316; }
+        .feature-card h4 { font-weight: 600; margin-bottom: 0.75rem; }
+        .feature-card p { color: var(--gray-500); margin: 0; }
+        
+        .how-it-works-section { padding: 6rem 0; background: var(--gray-100); }
+        .step-card { text-align: center; position: relative; }
+        .step-number { width: 60px; height: 60px; border-radius: 50%; background: var(--gradient-primary); color: white; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; }
+        .step-card h4 { font-weight: 600; margin-bottom: 0.75rem; }
+        .step-card p { color: var(--gray-500); }
+        
+        .cta-section { padding: 6rem 0; background: var(--gradient-primary); color: white; text-align: center; }
+        .cta-section h2 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        .cta-section p { font-size: 1.1rem; opacity: 0.9; margin-bottom: 2rem; }
+        
+        .footer { background: var(--dark-color); color: white; padding: 3rem 0 1.5rem; }
+        .footer-brand { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+        .footer-text { color: var(--gray-400); font-size: 0.9rem; }
+        .footer-links h5 { font-weight: 600; margin-bottom: 1rem; }
+        .footer-links ul { list-style: none; padding: 0; margin: 0; }
+        .footer-links li { margin-bottom: 0.5rem; }
+        .footer-links a { color: var(--gray-400); font-size: 0.9rem; transition: color var(--transition-fast); }
+        .footer-links a:hover { color: white; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; margin-top: 2rem; text-align: center; color: var(--gray-500); font-size: 0.875rem; }
+        
+        @media (max-width: 991.98px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-card { transform: none; margin-top: 3rem; }
+            .floating-card { display: none; }
+        }
+        
+        .landing-navbar { position: absolute; top: 0; left: 0; right: 0; z-index: 100; padding: 1.5rem 0; }
+        .landing-navbar .navbar-brand { color: white; font-size: 1.5rem; font-weight: 700; }
+        .landing-navbar .nav-link { color: rgba(255,255,255,0.85); font-weight: 500; padding: 0.5rem 1rem; }
+        .landing-navbar .nav-link:hover { color: white; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg landing-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-layer-group me-2"></i>FlashCard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars text-white"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#features">Tính năng</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#how-it-works">Cách hoạt động</a></li>
+                    <li class="nav-item ms-lg-3"><a class="btn btn-outline-light-custom" href="pages/login.html">Đăng nhập</a></li>
+                    <li class="nav-item ms-2"><a class="btn btn-light-custom" href="pages/register.html">Đăng ký</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <h1 class="hero-title">Học tập thông minh với Flashcard</h1>
+                    <p class="hero-subtitle">Nền tảng học tập hiện đại giúp bạn ghi nhớ kiến thức hiệu quả hơn với phương pháp lặp lại ngắt quãng (Spaced Repetition) và hệ thống thẻ ghi nhớ thông minh.</p>
+                    <div class="hero-buttons">
+                        <a href="pages/register.html" class="btn btn-light-custom"><i class="fas fa-rocket me-2"></i>Bắt đầu miễn phí</a>
+                        <a href="#features" class="btn btn-outline-light-custom"><i class="fas fa-play me-2"></i>Tìm hiểu thêm</a>
+                    </div>
+                    <div class="mt-4 d-flex align-items-center gap-4">
+                        <div class="d-flex align-items-center"><i class="fas fa-check-circle text-white me-2"></i><span class="text-white">Miễn phí</span></div>
+                        <div class="d-flex align-items-center"><i class="fas fa-check-circle text-white me-2"></i><span class="text-white">Dễ sử dụng</span></div>
+                        <div class="d-flex align-items-center"><i class="fas fa-check-circle text-white me-2"></i><span class="text-white">Hiệu quả cao</span></div>
+                    </div>
+                </div>
+                <div class="col-lg-6 hero-image d-none d-lg-block">
+                    <div class="hero-card">
+                        <div class="text-center mb-4">
+                            <span class="badge bg-primary mb-3">Flashcard</span>
+                            <h3 class="fw-bold text-dark">Photosynthesis</h3>
+                        </div>
+                        <div class="bg-light rounded-3 p-4 text-center">
+                            <p class="text-muted mb-0">Quá trình mà thực vật sử dụng ánh sáng mặt trời để chuyển đổi CO₂ và nước thành glucose và oxy.</p>
+                        </div>
+                        <div class="d-flex justify-content-center gap-3 mt-4">
+                            <button class="btn btn-outline-danger rounded-pill px-4"><i class="fas fa-times me-1"></i> Chưa nhớ</button>
+                            <button class="btn btn-outline-success rounded-pill px-4"><i class="fas fa-check me-1"></i> Đã nhớ</button>
+                        </div>
+                    </div>
+                    <div class="floating-card floating-card-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-success rounded-circle p-2"><i class="fas fa-check text-white"></i></div>
+                            <span class="fw-semibold">+50 thẻ đã học</span>
+                        </div>
+                    </div>
+                    <div class="floating-card floating-card-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-warning rounded-circle p-2"><i class="fas fa-fire text-white"></i></div>
+                            <span class="fw-semibold">7 ngày streak!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Tại sao chọn FlashCard?</h2>
+                <p class="section-subtitle">Những tính năng giúp việc học trở nên hiệu quả hơn</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon purple"><i class="fas fa-brain"></i></div>
+                        <h4>Spaced Repetition</h4>
+                        <p>Thuật toán thông minh gợi ý thời điểm ôn tập tối ưu để ghi nhớ lâu dài</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon blue"><i class="fas fa-folder-open"></i></div>
+                        <h4>Tổ chức khoa học</h4>
+                        <p>Sắp xếp flashcard theo thư mục, bộ học liệu để dễ dàng quản lý</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon green"><i class="fas fa-clipboard-check"></i></div>
+                        <h4>Quiz thông minh</h4>
+                        <p>Tự động tạo bài kiểm tra từ flashcard, chấm điểm và theo dõi tiến độ</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon orange"><i class="fas fa-users"></i></div>
+                        <h4>Lớp học online</h4>
+                        <p>Tạo lớp, chia sẻ tài liệu và học cùng bạn bè, đồng nghiệp</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works-section" id="how-it-works">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Cách hoạt động</h2>
+                <p class="section-subtitle">Chỉ 3 bước đơn giản để bắt đầu học</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h4>Tạo Flashcard</h4>
+                        <p>Tạo các thẻ ghi nhớ với khái niệm và định nghĩa. Thêm hình ảnh để dễ nhớ hơn.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h4>Học & Ôn tập</h4>
+                        <p>Lật thẻ để học, đánh dấu mức độ ghi nhớ. Hệ thống sẽ tự động nhắc ôn tập.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h4>Kiểm tra</h4>
+                        <p>Làm quiz để củng cố kiến thức và theo dõi tiến độ học tập của bạn.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Sẵn sàng học tập hiệu quả hơn?</h2>
+            <p>Đăng ký miễn phí ngay hôm nay và trải nghiệm cách học thông minh</p>
+            <a href="pages/register.html" class="btn btn-light-custom btn-lg"><i class="fas fa-rocket me-2"></i>Bắt đầu ngay</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <div class="footer-brand"><i class="fas fa-layer-group me-2"></i>FlashCard</div>
+                    <p class="footer-text">Nền tảng học tập thông minh giúp bạn ghi nhớ kiến thức hiệu quả với phương pháp Spaced Repetition.</p>
+                </div>
+                <div class="col-6 col-lg-2 footer-links">
+                    <h5>Sản phẩm</h5>
+                    <ul><li><a href="#">Tính năng</a></li><li><a href="#">Bảng giá</a></li><li><a href="#">FAQ</a></li></ul>
+                </div>
+                <div class="col-6 col-lg-2 footer-links">
+                    <h5>Công ty</h5>
+                    <ul><li><a href="#">Về chúng tôi</a></li><li><a href="#">Blog</a></li><li><a href="#">Liên hệ</a></li></ul>
+                </div>
+                <div class="col-6 col-lg-2 footer-links">
+                    <h5>Hỗ trợ</h5>
+                    <ul><li><a href="#">Trung tâm trợ giúp</a></li><li><a href="#">Điều khoản</a></li><li><a href="#">Bảo mật</a></li></ul>
+                </div>
+                <div class="col-6 col-lg-2 footer-links">
+                    <h5>Kết nối</h5>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="#" class="text-white fs-5"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-white fs-5"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="mb-0">© 2024 FlashCard. HUST - CN Web và dịch vụ trực tuyến.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('flashcard_token');
+            if (token) { window.location.href = 'pages/dashboard.html'; }
+        });
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) { target.scrollIntoView({ behavior: 'smooth' }); }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - FlashCard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="navbar-container"></div>
+    <div id="sidebar-container"></div>
+    
+    <main class="main-content">
+        <div class="quiz-container">
+            <!-- Quiz Header -->
+            <div class="page-header text-center" id="quiz-header">
+                <h1 id="quiz-title">Đang tải...</h1>
+                <p>Kiểm tra kiến thức của bạn</p>
+            </div>
+            
+            <!-- Quiz Progress -->
+            <div class="quiz-progress" id="quiz-progress">
+                <div class="quiz-progress-text">
+                    <span id="question-num">Câu 1 / 10</span>
+                    <span id="timer"></span>
+                </div>
+                <div class="progress-custom">
+                    <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <!-- Quiz Question -->
+            <div id="quiz-content">
+                <div class="loading-spinner"><div class="spinner"></div></div>
+            </div>
+            
+            <!-- Quiz Result (hidden by default) -->
+            <div id="quiz-result" class="d-none">
+                <div class="card-custom">
+                    <div class="card-body quiz-result">
+                        <div class="quiz-result-icon" id="result-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h2 id="result-title">Kết quả</h2>
+                        <div class="quiz-result-score" id="result-score">0%</div>
+                        <p class="text-muted" id="result-detail">0/0 câu đúng</p>
+                        
+                        <div class="d-flex justify-content-center gap-3 mt-4">
+                            <button class="btn btn-outline-primary" onclick="retryQuiz()">
+                                <i class="fas fa-redo me-1"></i> Làm lại
+                            </button>
+                            <a href="#" id="btn-study" class="btn btn-primary-custom">
+                                <i class="fas fa-graduation-cap me-1"></i> Học tiếp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+    
+    <script>
+        let studySetId;
+        let questions = [];
+        let currentQuestion = 0;
+        let answers = [];
+        let selectedAnswer = null;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!Utils.requireAuth()) return;
+            
+            studySetId = Utils.getUrlParam('id');
+            if (!studySetId) {
+                Utils.error('Không tìm thấy bộ học');
+                window.location.href = 'folders.html';
+                return;
+            }
+            
+            document.getElementById('btn-study').href = `study.html?id=${studySetId}`;
+            
+            await loadStudySet();
+            await loadQuiz();
+        });
+        
+        async function loadStudySet() {
+            try {
+                const data = await API.getStudySetById(studySetId);
+                document.getElementById('quiz-title').textContent = `Quiz: ${data.name}`;
+            } catch (error) {
+                Utils.error('Không thể tải thông tin');
+            }
+        }
+        
+        async function loadQuiz() {
+            try {
+                questions = await API.getQuiz(studySetId);
+                
+                if (!questions || questions.length === 0) {
+                    document.getElementById('quiz-content').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fas fa-question-circle"></i></div>
+                            <h3>Không thể tạo quiz</h3>
+                            <p>Cần ít nhất 4 thẻ để tạo quiz</p>
+                            <a href="studyset-detail.html?id=${studySetId}" class="btn btn-primary-custom">
+                                <i class="fas fa-plus me-1"></i> Thêm thẻ
+                            </a>
+                        </div>
+                    `;
+                    document.getElementById('quiz-progress').classList.add('d-none');
+                    return;
+                }
+                
+                answers = new Array(questions.length).fill(null);
+                renderQuestion();
+            } catch (error) {
+                Utils.error(error.message || 'Không thể tải quiz');
+                document.getElementById('quiz-content').innerHTML = `<p class="text-center text-muted">${error.message}</p>`;
+            }
+        }
+        
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            
+            document.getElementById('question-num').textContent = `Câu ${currentQuestion + 1} / ${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            
+            document.getElementById('quiz-content').innerHTML = `
+                <div class="quiz-question-card">
+                    <div class="quiz-question-number">Câu hỏi ${currentQuestion + 1}</div>
+                    <div class="quiz-question-text">${Utils.escapeHtml(q.question)}</div>
+                    <div class="quiz-options">
+                        ${q.answer.map((opt, i) => `
+                            <div class="quiz-option ${answers[currentQuestion] === opt ? 'selected' : ''}" 
+                                 onclick="selectAnswer('${Utils.escapeHtml(opt).replace(/'/g, "\\'")}', this)">
+                                <div class="quiz-option-letter">${optionLetters[i]}</div>
+                                <div class="quiz-option-text">${Utils.escapeHtml(opt)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button class="btn btn-outline-secondary" onclick="prevQuestion()" ${currentQuestion === 0 ? 'disabled' : ''}>
+                        <i class="fas fa-chevron-left me-1"></i> Trước
+                    </button>
+                    ${currentQuestion === questions.length - 1 ? `
+                        <button class="btn btn-primary-custom" onclick="submitQuiz()">
+                            <i class="fas fa-check me-1"></i> Nộp bài
+                        </button>
+                    ` : `
+                        <button class="btn btn-primary-custom" onclick="nextQuestion()">
+                            Tiếp <i class="fas fa-chevron-right ms-1"></i>
+                        </button>
+                    `}
+                </div>
+            `;
+        }
+        
+        function selectAnswer(answer, element) {
+            answers[currentQuestion] = answer;
+            
+            document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+        
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            }
+        }
+        
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+        
+        async function submitQuiz() {
+            // Check if all questions answered
+            const unanswered = answers.filter(a => a === null).length;
+            if (unanswered > 0) {
+                const confirm = await Utils.confirm(`Bạn còn ${unanswered} câu chưa trả lời. Vẫn nộp bài?`);
+                if (!confirm) return;
+            }
+            
+            try {
+                // Prepare answers for API
+                const answerData = questions.map((q, i) => ({
+                    itemId: q.id,
+                    answer: answers[i] || ''
+                }));
+                
+                const quizName = `Quiz ${new Date().toLocaleDateString('vi-VN')}`;
+                const result = await API.submitQuiz(studySetId, quizName, answerData);
+                
+                showResult(result);
+            } catch (error) {
+                Utils.error(error.message || 'Không thể nộp bài');
+            }
+        }
+        
+        function showResult(result) {
+            document.getElementById('quiz-header').classList.add('d-none');
+            document.getElementById('quiz-progress').classList.add('d-none');
+            document.getElementById('quiz-content').classList.add('d-none');
+            document.getElementById('quiz-result').classList.remove('d-none');
+            
+            const score = result.successPercent || 0;
+            let iconClass, title;
+            
+            if (score >= 80) {
+                iconClass = 'success';
+                title = 'Xuất sắc! 🎉';
+            } else if (score >= 50) {
+                iconClass = 'warning';
+                title = 'Khá tốt! 👍';
+            } else {
+                iconClass = 'danger';
+                title = 'Cần cố gắng thêm! 💪';
+            }
+            
+            document.getElementById('result-icon').className = `quiz-result-icon ${iconClass}`;
+            document.getElementById('result-icon').innerHTML = score >= 80 ? '<i class="fas fa-trophy"></i>' : score >= 50 ? '<i class="fas fa-thumbs-up"></i>' : '<i class="fas fa-book-reader"></i>';
+            document.getElementById('result-title').textContent = title;
+            document.getElementById('result-score').textContent = `${score}%`;
+            
+            const correct = Math.round(score * questions.length / 100);
+            document.getElementById('result-detail').textContent = `${correct}/${questions.length} câu đúng`;
+        }
+        
+        function retryQuiz() {
+            currentQuestion = 0;
+            answers = new Array(questions.length).fill(null);
+            
+            document.getElementById('quiz-header').classList.remove('d-none');
+            document.getElementById('quiz-progress').classList.remove('d-none');
+            document.getElementById('quiz-content').classList.remove('d-none');
+            document.getElementById('quiz-result').classList.add('d-none');
+            
+            // Shuffle questions
+            questions = Utils.shuffleArray(questions);
+            renderQuestion();
+        }
+    </script>
+    
+    <style>
+        .main-content {
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (min-width: 992px) {
+            .main-content {
+                margin-left: calc(260px + (100% - 260px - 800px) / 2);
+            }
+        }
+    </style>
+</body>
+</html>
