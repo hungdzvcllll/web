@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FlashCard</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar Container -->
+    <div id="navbar-container"></div>
+    
+    <!-- Sidebar Container -->
+    <div id="sidebar-container"></div>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Xin chào, <span id="welcome-name">User</span>! 👋</h1>
+            <p>Hãy bắt đầu ngày mới với việc học tập nhé</p>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: rgba(79, 70, 229, 0.1); color: #4f46e5;">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="stats-value" id="stat-folders">0</div>
+                    <div class="stats-label">Thư mục</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="stats-value" id="stat-studysets">0</div>
+                    <div class="stats-label">Bộ học</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stats-value" id="stat-classes">0</div>
+                    <div class="stats-label">Lớp học</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="stats-value" id="stat-quizzes">0</div>
+                    <div class="stats-label">Bài kiểm tra</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card-custom mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Bắt đầu nhanh</h5>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-custom w-100 py-3" onclick="showCreateFolderModal()">
+                            <i class="fas fa-folder-plus d-block mb-2 fs-4"></i>
+                            <span>Tạo thư mục</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-custom w-100 py-3" onclick="window.location.href='create-studyset.html'">
+                            <i class="fas fa-plus-circle d-block mb-2 fs-4"></i>
+                            <span>Tạo bộ học</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-custom w-100 py-3" onclick="showCreateClassModal()">
+                            <i class="fas fa-chalkboard-teacher d-block mb-2 fs-4"></i>
+                            <span>Tạo lớp học</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-custom w-100 py-3" onclick="window.location.href='explore.html'">
+                            <i class="fas fa-search d-block mb-2 fs-4"></i>
+                            <span>Khám phá</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Recent Folders -->
+            <div class="col-lg-6 mb-4">
+                <div class="card-custom h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">Thư mục gần đây</h5>
+                            <a href="folders.html" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+                        </div>
+                        <div id="recent-folders">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Classes -->
+            <div class="col-lg-6 mb-4">
+                <div class="card-custom h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">Lớp học của bạn</h5>
+                            <a href="classes.html" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+                        </div>
+                        <div id="recent-classes">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Create Folder Modal -->
+    <div class="modal fade modal-custom" id="createFolderModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tạo thư mục mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="create-folder-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="folder-name" class="form-label">Tên thư mục</label>
+                            <input type="text" class="form-control form-control-custom" id="folder-name" 
+                                   placeholder="Nhập tên thư mục" required>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="folder-private" checked>
+                            <label class="form-check-label" for="folder-private">
+                                <i class="fas fa-lock me-1"></i> Riêng tư (chỉ mình bạn xem được)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary-custom">
+                            <i class="fas fa-plus me-1"></i> Tạo thư mục
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Class Modal -->
+    <div class="modal fade modal-custom" id="createClassModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tạo lớp học mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="create-class-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="class-name" class="form-label">Tên lớp học</label>
+                            <input type="text" class="form-control form-control-custom" id="class-name" 
+                                   placeholder="Ví dụ: Tiếng Anh 12A1" required>
+                        </div>
+                        <div class="alert alert-info small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Sau khi tạo lớp, bạn có thể mời học sinh tham gia và chia sẻ bộ học liệu.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary-custom">
+                            <i class="fas fa-plus me-1"></i> Tạo lớp học
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Config & API -->
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+    
+    <script>
+        let createFolderModal, createClassModal;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check authentication
+            if (!Utils.requireAuth()) return;
+            
+            // Initialize modals
+            createFolderModal = new bootstrap.Modal(document.getElementById('createFolderModal'));
+            createClassModal = new bootstrap.Modal(document.getElementById('createClassModal'));
+            
+            // Update welcome name
+            const user = Utils.getCurrentUser();
+            if (user) {
+                document.getElementById('welcome-name').textContent = user.username;
+            }
+            
+            // Load data
+            await Promise.all([
+                loadRecentFolders(),
+                loadRecentClasses(),
+                loadStats()
+            ]);
+            
+            // Setup form handlers
+            setupFormHandlers();
+        });
+        
+        async function loadStats() {
+            try {
+                // Load folders count
+                const folders = await API.getYourFolders(0, 1);
+                document.getElementById('stat-folders').textContent = folders.totalElements || 0;
+                
+                // Load classes count
+                const classes = await API.getYourClasses(0, 1);
+                document.getElementById('stat-classes').textContent = classes.totalElements || 0;
+                
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+        
+        async function loadRecentFolders() {
+            const container = document.getElementById('recent-folders');
+            
+            try {
+                const response = await API.getYourFolders(0, 5);
+                const folders = response.content || [];
+                
+                if (folders.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fas fa-folder-open text-muted mb-2" style="font-size: 2rem;"></i>
+                            <p class="text-muted mb-2">Chưa có thư mục nào</p>
+                            <button class="btn btn-sm btn-primary-custom" onclick="showCreateFolderModal()">
+                                <i class="fas fa-plus me-1"></i> Tạo thư mục
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = folders.map(folder => `
+                    <a href="folder-detail.html?id=${folder.folderId}" class="d-flex align-items-center p-3 rounded-3 text-decoration-none folder-item">
+                        <div class="folder-icon me-3" style="width: 45px; height: 45px; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-folder text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0 text-dark">${Utils.escapeHtml(folder.folderName)}</h6>
+                            <small class="text-muted">${folder.role === 'CREATE' ? 'Tạo bởi bạn' : 'Được mời'}</small>
+                        </div>
+                        <i class="fas fa-chevron-right text-muted"></i>
+                    </a>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Failed to load folders:', error);
+                container.innerHTML = '<p class="text-muted text-center">Không thể tải dữ liệu</p>';
+            }
+        }
+        
+        async function loadRecentClasses() {
+            const container = document.getElementById('recent-classes');
+            
+            try {
+                const response = await API.getYourClasses(0, 5);
+                const classes = response.content || [];
+                
+                if (classes.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fas fa-users text-muted mb-2" style="font-size: 2rem;"></i>
+                            <p class="text-muted mb-2">Chưa tham gia lớp nào</p>
+                            <button class="btn btn-sm btn-primary-custom" onclick="showCreateClassModal()">
+                                <i class="fas fa-plus me-1"></i> Tạo lớp học
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = classes.map(cls => `
+                    <a href="class-detail.html?id=${cls.classId}" class="d-flex align-items-center p-3 rounded-3 text-decoration-none folder-item">
+                        <div class="me-3" style="width: 45px; height: 45px; background: var(--gradient-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-users text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0 text-dark">${Utils.escapeHtml(cls.className)}</h6>
+                            <small class="text-muted">${cls.role === 'TEACHER' ? 'Giáo viên' : 'Học sinh'}</small>
+                        </div>
+                        <span class="badge ${cls.role === 'TEACHER' ? 'bg-primary' : 'bg-secondary'}">${cls.role === 'TEACHER' ? 'GV' : 'HS'}</span>
+                    </a>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Failed to load classes:', error);
+                container.innerHTML = '<p class="text-muted text-center">Không thể tải dữ liệu</p>';
+            }
+        }
+        
+        function setupFormHandlers() {
+            // Create folder form
+            document.getElementById('create-folder-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('folder-name').value.trim();
+                const isPrivate = document.getElementById('folder-private').checked;
+                
+                if (!name) {
+                    Utils.error('Vui lòng nhập tên thư mục');
+                    return;
+                }
+                
+                try {
+                    await API.createPersonalFolder(name, isPrivate);
+                    Utils.success('Tạo thư mục thành công!');
+                    createFolderModal.hide();
+                    document.getElementById('folder-name').value = '';
+                    loadRecentFolders();
+                    loadStats();
+                } catch (error) {
+                    Utils.error(error.message || 'Không thể tạo thư mục');
+                }
+            });
+            
+            // Create class form
+            document.getElementById('create-class-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('class-name').value.trim();
+                
+                if (!name) {
+                    Utils.error('Vui lòng nhập tên lớp học');
+                    return;
+                }
+                
+                try {
+                    await API.createClass(name);
+                    Utils.success('Tạo lớp học thành công!');
+                    createClassModal.hide();
+                    document.getElementById('class-name').value = '';
+                    loadRecentClasses();
+                    loadStats();
+                } catch (error) {
+                    Utils.error(error.message || 'Không thể tạo lớp học');
+                }
+            });
+        }
+        
+        function showCreateFolderModal() {
+            createFolderModal.show();
+        }
+        
+        function showCreateClassModal() {
+            createClassModal.show();
+        }
+    </script>
+    
+    <style>
+        .folder-item {
+            transition: all 0.2s ease;
+            color: inherit;
+        }
+        .folder-item:hover {
+            background: var(--gray-100);
+        }
+    </style>
+</body>
+</html>
