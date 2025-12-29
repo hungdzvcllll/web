@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết lớp học - FlashCard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="navbar-container"></div>
+    <div id="sidebar-container"></div>
+    
+    <main class="main-content">
+        <div class="page-header">
+            <nav class="breadcrumb-custom"><ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="dashboard.html">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="classes.html">Lớp học</a></li>
+                <li class="breadcrumb-item active" id="breadcrumb-name">Loading...</li>
+            </ol></nav>
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div>
+                    <h1 id="class-title"><i class="fas fa-users text-primary me-2"></i>Loading...</h1>
+                    <p id="class-role">Đang tải...</p>
+                </div>
+                <div class="d-flex gap-2" id="teacher-actions" style="display: none !important;">
+                    <button class="btn btn-outline-custom" onclick="showAddStudentModal()">
+                        <i class="fas fa-user-plus me-1"></i> Thêm học sinh
+                    </button>
+                    <button class="btn btn-primary-custom" onclick="showCreateFolderModal()">
+                        <i class="fas fa-folder-plus me-1"></i> Tạo thư mục
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#folders-tab">
+                    <i class="fas fa-folder me-1"></i> Tài liệu
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#members-tab">
+                    <i class="fas fa-users me-1"></i> Thành viên
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <!-- Folders Tab -->
+            <div class="tab-pane fade show active" id="folders-tab">
+                <div id="class-folders" class="row g-4">
+                    <div class="col-12"><div class="loading-spinner"><div class="spinner"></div></div></div>
+                </div>
+            </div>
+            
+            <!-- Members Tab -->
+            <div class="tab-pane fade" id="members-tab">
+                <div id="class-members">
+                    <div class="loading-spinner"><div class="spinner"></div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Add Student Modal -->
+    <div class="modal fade modal-custom" id="addStudentModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm học sinh</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="add-student-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="student-id" class="form-label">ID học sinh</label>
+                            <input type="number" class="form-control" id="student-id" placeholder="Nhập ID học sinh" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary-custom"><i class="fas fa-plus me-1"></i> Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Folder Modal -->
+    <div class="modal fade modal-custom" id="createFolderModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tạo thư mục cho lớp</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="create-folder-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="folder-name" class="form-label">Tên thư mục</label>
+                            <input type="text" class="form-control" id="folder-name" placeholder="Nhập tên thư mục" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary-custom"><i class="fas fa-plus me-1"></i> Tạo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+    
+    <script>
+        let classId, classData, isTeacher = false;
+        let addStudentModal, createFolderModal;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!Utils.requireAuth()) return;
+            
+            classId = Utils.getUrlParam('id');
+            if (!classId) {
+                Utils.error('Không tìm thấy lớp học');
+                window.location.href = 'classes.html';
+                return;
+            }
+            
+            addStudentModal = new bootstrap.Modal(document.getElementById('addStudentModal'));
+            createFolderModal = new bootstrap.Modal(document.getElementById('createFolderModal'));
+            
+            await loadClassDetail();
+            await Promise.all([loadFolders(), loadMembers()]);
+            setupEventListeners();
+        });
+        
+        async function loadClassDetail() {
+            try {
+                classData = await API.getClassById(classId);
+                document.getElementById('class-title').innerHTML = `<i class="fas fa-users text-primary me-2"></i>${Utils.escapeHtml(classData.name)}`;
+                document.getElementById('breadcrumb-name').textContent = classData.name;
+                
+                // Check if teacher
+                const classes = await API.getYourClasses(0, 100);
+                const myClass = classes.content?.find(c => c.classId == classId);
+                if (myClass && myClass.role === 'TEACHER') {
+                    isTeacher = true;
+                    document.getElementById('teacher-actions').style.display = 'flex !important';
+                    document.getElementById('teacher-actions').classList.remove('d-none');
+                    document.getElementById('class-role').textContent = '👨‍🏫 Bạn là giáo viên của lớp này';
+                } else {
+                    document.getElementById('class-role').textContent = '👨‍🎓 Bạn là học sinh của lớp này';
+                }
+            } catch (error) {
+                Utils.error('Không thể tải thông tin lớp');
+            }
+        }
+        
+        async function loadFolders() {
+            const container = document.getElementById('class-folders');
+            try {
+                const response = await API.getClassFolders(classId);
+                const folders = response.content || [];
+                
+                if (folders.length === 0) {
+                    container.innerHTML = `<div class="col-12"><div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-folder-open"></i></div>
+                        <h3>Chưa có tài liệu</h3>
+                        <p>Lớp học chưa có thư mục tài liệu nào</p>
+                        ${isTeacher ? '<button class="btn btn-primary-custom" onclick="showCreateFolderModal()"><i class="fas fa-plus me-1"></i> Tạo thư mục</button>' : ''}
+                    </div></div>`;
+                    return;
+                }
+                
+                container.innerHTML = folders.map(f => `
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card-custom folder-card h-100" onclick="location.href='folder-detail.html?id=${f.id}'">
+                            <div class="card-body">
+                                <div class="folder-icon"><i class="fas fa-folder"></i></div>
+                                <h5 class="folder-name">${Utils.escapeHtml(f.name)}</h5>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                container.innerHTML = '<div class="col-12"><p class="text-center text-muted">Không thể tải dữ liệu</p></div>';
+            }
+        }
+        
+        async function loadMembers() {
+            const container = document.getElementById('class-members');
+            try {
+                const response = await API.getUsersInClass(classId);
+                const members = response.content || [];
+                
+                if (members.length === 0) {
+                    container.innerHTML = '<p class="text-center text-muted">Không có thành viên</p>';
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <div class="card-custom">
+                        <div class="list-group list-group-flush">
+                            ${members.map(m => `
+                                <div class="list-group-item d-flex align-items-center">
+                                    <div class="user-avatar me-3">${Utils.getInitials(m.username)}</div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">${Utils.escapeHtml(m.username)}</h6>
+                                        <small class="text-muted">${m.role === 'TEACHER' ? 'Giáo viên' : 'Học sinh'}</small>
+                                    </div>
+                                    <span class="badge ${m.role === 'TEACHER' ? 'badge-primary' : 'badge-success'}">${m.role === 'TEACHER' ? 'GV' : 'HS'}</span>
+                                    ${isTeacher && m.role !== 'TEACHER' ? `
+                                        <button class="btn btn-sm btn-outline-danger ms-2" onclick="removeStudent(${m.userId})">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                container.innerHTML = '<p class="text-center text-muted">Không thể tải dữ liệu</p>';
+            }
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('add-student-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const userId = document.getElementById('student-id').value;
+                try {
+                    await API.addStudentToClass(userId, classId);
+                    Utils.success('Thêm học sinh thành công!');
+                    addStudentModal.hide();
+                    document.getElementById('student-id').value = '';
+                    loadMembers();
+                } catch (error) { Utils.error(error.message || 'Lỗi'); }
+            });
+            
+            document.getElementById('create-folder-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const name = document.getElementById('folder-name').value.trim();
+                try {
+                    await API.createClassFolder(name, classId);
+                    Utils.success('Tạo thư mục thành công!');
+                    createFolderModal.hide();
+                    document.getElementById('folder-name').value = '';
+                    loadFolders();
+                } catch (error) { Utils.error(error.message || 'Lỗi'); }
+            });
+        }
+        
+        async function removeStudent(userId) {
+            if (await Utils.confirm('Xóa học sinh này khỏi lớp?')) {
+                try {
+                    await API.removeStudentFromClass(userId, classId);
+                    Utils.success('Đã xóa học sinh');
+                    loadMembers();
+                } catch (error) { Utils.error(error.message || 'Lỗi'); }
+            }
+        }
+        
+        function showAddStudentModal() { addStudentModal.show(); }
+        function showCreateFolderModal() { createFolderModal.show(); }
+    </script>
+</body>
+</html>
