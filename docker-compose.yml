@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+  api_service:
+    build: .
+    restart: always
+    ports:
+      - 8081:8081
+    depends_on:
+      - mysql_db
+
+  mysql_db:
+    image: "mysql:8.0"
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: quizlet
+      MYSQL_USER: user
+      MYSQL_PASSWORD: hungdz
+      MYSQL_ROOT_PASSWORD: hungdz

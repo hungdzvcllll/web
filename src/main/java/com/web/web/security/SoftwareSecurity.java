@@ -100,7 +100,7 @@ public class SoftwareSecurity implements WebMvcConfigurer {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
-                "http://localhost:3000",            // ✅ thêm dòng này để test local
+                "http://localhost:8080",            // ✅ thêm dòng này để test local
                "https://antmotor.vn",
                "https://www.antmotor.vn",    // ✅ giữ nguyên cho production
                 "https://oc-01-k68m.vercel.app"
