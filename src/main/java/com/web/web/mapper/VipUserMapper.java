@@ -7,7 +7,7 @@ import com.web.web.dto.response.VipUserResponse;
 import com.web.web.entity.VipUser;
 @Mapper(componentModel = "spring")
 public interface VipUserMapper {
-    @Mapping(target="userId",source="user.id")
-    @Mapping(target="userName",source="user.username")
-    public VipUserResponse toDTO(VipUser vu);
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "userName", source = "user.username")
+    VipUserResponse toDTO(VipUser vu);
 }
