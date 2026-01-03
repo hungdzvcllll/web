@@ -1,6 +1,8 @@
 package com.web.web.service.impl;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -81,6 +83,12 @@ public class FolderService {
     
     public Page<FolderResponse> findPublicByName(String name,Pageable pageable){
         return folderRepo.findByIsPrivateAndName(false,name,pageable).map(folderMapper::toDTO);
+    }
+    
+    public List<FolderResponse> searchByName(String name) {
+    return folderRepo.findByNameContaining(name).stream()
+        .map(f -> folderMapper.toDTO(f))
+        .collect(Collectors.toList());
     }
     
     public void delete(Integer id) {

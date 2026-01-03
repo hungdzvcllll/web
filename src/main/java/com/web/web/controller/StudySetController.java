@@ -46,6 +46,10 @@ public class StudySetController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestParam("name") String name) {
+        return ResponseEntity.ok(service.searchByName(name));
+    }
     @DeleteMapping("/delete")
     public ResponseEntity<?> delete(@RequestParam("id") Integer id) {
         try {

@@ -1,5 +1,8 @@
 package com.web.web.service.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.data.domain.Page;
@@ -35,7 +38,11 @@ public class StudySetService {
         
         return studySetRepo.findByFolder(new Folder(folderId), null).map(mapper::toDTO);
     }
-
+    public List<StudySetResponse> searchByName(String name) {
+    return studySetRepo.findByNameContaining(name).stream()
+            .map(s -> mapper.toDTO(s))
+            .collect(Collectors.toList());
+    }
     public void delete(Integer id) {
         StudySet set = studySetRepo.findById(id)
             .orElseThrow(() -> new RuntimeException("StudySet not found"));

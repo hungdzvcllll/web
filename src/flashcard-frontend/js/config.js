@@ -27,7 +27,8 @@ const CONFIG = {
         FOLDER_FIND_BY_ID: '/folder/findById',
         FOLDER_FIND_BY_NAME: '/folder/findByName',
         FOLDER_FIND_CLASS: '/folder/findClassFolder',
-        
+        FOLDER_SEARCH: '/folder/search',
+
         // Access Folder
         ACCESS_FOLDER_INVITE: '/accessFolder/invite',
         ACCESS_FOLDER_YOUR: '/accessFolder/yourFolders',
@@ -37,7 +38,8 @@ const CONFIG = {
         STUDYSET_DELETE: '/studySet/delete',
         STUDYSET_FIND_BY_ID: '/studySet/findById',
         STUDYSET_FIND_BY_FOLDER: '/studySet/findByFolderId',
-        
+        STUDYSET_SEARCH: '/studySet/search',
+
         // Study Set Item (Flashcard)
         ITEM_ADD: '/item/add',
         ITEM_DELETE: '/item/delete',
@@ -55,6 +57,7 @@ const CONFIG = {
         CLASS_CREATE: '/class/create',
         CLASS_DELETE: '/class/delete',
         CLASS_FIND_BY_ID: '/class/findById',
+        CLASS_SEARCH: '/class/search',
         
         // User In Class
         USER_IN_CLASS_YOUR: '/userInClass/yourClass',

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Tìm kiếm - FlashCard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div id="sidebar-container"></div>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Kết quả tìm kiếm</h1>
+      <p id="search-query" class="text-muted"></p>
+    </div>
+
+    <section id="results">
+      <div class="mb-4">
+        <h4>Bộ học</h4>
+        <div id="results-studysets" class="row g-3"></div>
+      </div>
+
+      <div class="mb-4">
+        <h4>Thư mục</h4>
+        <div id="results-folders" class="row g-3"></div>
+      </div>
+
+      <div class="mb-4">
+        <h4>Lớp</h4>
+        <div id="results-classes" class="row g-3"></div>
+      </div>
+
+      <div id="results-fallback" class="text-muted mt-3"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+
+  <script>
+    const normalize = (r) => {
+      if (!r) return [];
+      if (Array.isArray(r)) return r;
+      if (r.content) return r.content;
+      if (r.data && Array.isArray(r.data)) return r.data;
+      return [];
+    };
+
+    const tryCall = async (names, ...args) => {
+      for (const n of names) {
+        if (typeof API[n] === 'function') {
+          try { return await API[n](...args); } catch(e){ /* ignore and try next */ }
+        }
+      }
+      return null;
+    };
+
+    const renderCards = (containerId, items, titleField='name', hrefTemplate=null) => {
+      const c = document.getElementById(containerId);
+      if (!items || items.length === 0) { c.innerHTML = '<p class="text-muted">Không tìm thấy.</p>'; return; }
+      c.innerHTML = items.map(it => {
+        const title = Utils.escapeHtml(it[titleField] || it.title || it.name || '—');
+        const id = it.id || it._id || '';
+        const href = hrefTemplate ? hrefTemplate.replace('{id}', id) : '#';
+        return `<div class="col-sm-6 col-lg-4">
+                  <a class="card-custom h-100 d-block p-3" href="${href}">
+                    <h6 class="mb-1">${title}</h6>
+                    <small class="text-muted">#${id}</small>
+                  </a>
+                </div>`;
+      }).join('');
+    };
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const q = (new URLSearchParams(window.location.search).get('q') || '').trim();
+    document.getElementById('search-query').textContent = q ? `Tìm kiếm: "${q}"` : 'Không có từ khóa';
+    if (!q) { 
+        document.getElementById('results-fallback').textContent = 'Nhập từ khóa để tìm kiếm.'; 
+        return; 
+    }
+
+    const ssResp = await tryCall(['searchStudySets'], q); 
+    const studysets = normalize(ssResp); 
+    renderCards('results-studysets', studysets, 'name', 'studyset-detail.html?id={id}');
+
+    const fResp = await tryCall(['searchFolders'], q);
+    const folders = normalize(fResp);
+    renderCards('results-folders', folders, 'name', 'folder-detail.html?id={id}'); 
+
+    const cResp = await tryCall(['searchClasses'], q);
+    const classes = normalize(cResp);
+    renderCards('results-classes', classes, 'name', 'class-detail.html?id={id}');
+
+    if (studysets.length === 0 && folders.length === 0 && classes.length === 0) {
+        document.getElementById('results-fallback').innerHTML =
+        `Không tìm thấy kết quả nào cho "${Utils.escapeHtml(q)}". <br> 
+        Thử: <a href="explore.html">Khám phá</a> hoặc <a href="textbooks.html">Sách giáo khoa</a>.`;
+    }
+});
+  </script>
+</body>
+</html>

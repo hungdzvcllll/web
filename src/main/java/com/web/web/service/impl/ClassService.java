@@ -1,5 +1,8 @@
 package com.web.web.service.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +29,11 @@ public class ClassService {
         uInClassService.checkIfYouAreInClass(c);
         return mapper.toDTO(c);
     }
-    
+    public List<ClassResponse> searchByName(String name) {
+    return classRepo.findByNameContaining(name).stream()
+            .map(c -> mapper.toDTO(c))
+            .collect(Collectors.toList());
+    } 
     public void delete(Integer id){
         Class c = classRepo.findById(id).orElseThrow(() -> new RuntimeException("Class not found"));
         uInClassService.checkIfYouAreInClass(c);

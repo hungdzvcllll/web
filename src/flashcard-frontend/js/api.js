@@ -264,8 +264,8 @@ const API = {
         return this.get(CONFIG.API.FOLDER_FIND_BY_ID, { id });
     },
 
-    async searchFolders(name, page = 0, size = CONFIG.DEFAULT_PAGE_SIZE) {
-        return this.get(CONFIG.API.FOLDER_FIND_BY_NAME, { name, page, size });
+    async searchFolders(name) {
+        return this.get(CONFIG.API.FOLDER_SEARCH, { name });
     },
 
     async getClassFolders(classId, page = 0, size = CONFIG.DEFAULT_PAGE_SIZE) {
@@ -296,6 +296,10 @@ const API = {
 
     async getStudySetsByFolder(folderId, page = 0, size = CONFIG.DEFAULT_PAGE_SIZE) {
         return this.get(CONFIG.API.STUDYSET_FIND_BY_FOLDER, { folderId, page, size });
+    },
+
+    async searchStudySets(name) {
+        return this.get(CONFIG.API.STUDYSET_SEARCH, { name });
     },
 
     async deleteStudySet(id) {
@@ -397,6 +401,10 @@ const API = {
 
     async removeStudentFromClass(userId, classId) {
         return this.delete(CONFIG.API.USER_IN_CLASS_DELETE, { userId, classId });
+    },
+
+    async searchClasses(name) {
+        return this.get(CONFIG.API.CLASS_SEARCH, { name });
     },
 
     async deleteClass(id) {
