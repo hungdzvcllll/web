@@ -3,78 +3,347 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học Flashcard - FlashCard</title>
+    <title>Chế độ học - FlashCard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="../css/style.css" rel="stylesheet">
+    <style>
+        .study-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Selection cards */
+        .select-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+        .select-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .select-card.selected {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.05);
+        }
+        
+        /* Flashcard styles */
+        .flashcard-container {
+            perspective: 1000px;
+            height: 300px;
+        }
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .flashcard-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .flashcard-back {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+        .flashcard-label {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+        .flashcard-content {
+            font-size: 1.5rem;
+            text-align: center;
+            word-break: break-word;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .flashcard-hint {
+            position: absolute;
+            bottom: 15px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        .flashcard-image {
+            max-width: 180px;
+            max-height: 120px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        /* Navigation */
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #e2e8f0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: #64748b;
+        }
+        .nav-btn:hover:not(:disabled) {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Stats */
+        .stat-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        
+        /* Completion */
+        .completion-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+        .completion-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+        .stat-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Keyboard hints */
+        .kbd {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: monospace;
+            margin: 0 2px;
+            border: 1px solid #e2e8f0;
+        }
+    </style>
 </head>
 <body>
     <div id="navbar-container"></div>
     <div id="sidebar-container"></div>
     
     <main class="main-content">
-        <div class="page-header text-center">
-            <h1 id="studyset-title">Đang tải...</h1>
-            <p id="studyset-info">Học với flashcard</p>
-        </div>
-        
-        <!-- Progress -->
-        <div class="mb-4">
-            <div class="d-flex justify-content-between mb-2">
-                <span id="progress-text">Thẻ 0 / 0</span>
-                <span id="progress-percent">0%</span>
-            </div>
-            <div class="progress-custom">
-                <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
-            </div>
-        </div>
-        
-        <!-- Flashcard -->
-        <div class="flashcard-container mb-4" id="flashcard-wrapper">
-            <div class="flashcard" id="flashcard" onclick="flipCard()">
-                <div class="flashcard-face flashcard-front">
-                    <div class="flashcard-label">KHÁI NIỆM</div>
-                    <div class="flashcard-content" id="card-front">Đang tải...</div>
-                    <div class="flashcard-hint"><i class="fas fa-hand-pointer"></i> Click để lật thẻ</div>
+        <div class="study-container">
+            
+            <!-- Section 1: Chọn bộ học -->
+            <div id="section-select">
+                <div class="page-header text-center mb-4">
+                    <h1><i class="fas fa-graduation-cap text-primary me-2"></i>Chế độ học</h1>
+                    <p class="text-muted">Chọn một bộ học để bắt đầu ôn tập với flashcard</p>
                 </div>
-                <div class="flashcard-face flashcard-back">
-                    <div class="flashcard-label">ĐỊNH NGHĨA</div>
-                    <div class="flashcard-content" id="card-back">Đang tải...</div>
-                    <div class="flashcard-hint"><i class="fas fa-hand-pointer"></i> Click để lật thẻ</div>
+                
+                <!-- Chọn thư mục -->
+                <div class="card-custom mb-4">
+                    <div class="card-body">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-folder text-warning me-2"></i>Bước 1: Chọn thư mục
+                        </label>
+                        <select class="form-select form-select-lg" id="select-folder">
+                            <option value="">-- Chọn thư mục --</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Danh sách bộ học -->
+                <div id="studyset-list-container" style="display: none;">
+                    <div class="card-custom">
+                        <div class="card-body">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-layer-group text-primary me-2"></i>Bước 2: Chọn bộ học
+                            </label>
+                            <div id="studyset-list" class="row g-3 mt-2">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty state -->
+                <div id="empty-studyset" class="text-center py-5" style="display: none;">
+                    <i class="fas fa-inbox text-muted" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 text-muted">Thư mục này chưa có bộ học nào</h5>
+                    <p class="text-muted">Hãy tạo bộ học mới trước</p>
+                </div>
+                
+                <!-- Start button -->
+                <div id="start-btn-container" class="text-center mt-4" style="display: none;">
+                    <button class="btn btn-primary-custom btn-lg px-5" onclick="startStudy()">
+                        <i class="fas fa-play me-2"></i>Bắt đầu học
+                    </button>
                 </div>
             </div>
-        </div>
-        
-        <!-- Navigation -->
-        <div class="flashcard-nav">
-            <button class="btn-nav" id="btn-prev" onclick="prevCard()" disabled>
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <div class="flashcard-counter" id="counter">0 / 0</div>
-            <button class="btn-nav" id="btn-next" onclick="nextCard()">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-        
-        <!-- Action Buttons -->
-        <div class="text-center mt-4">
-            <button class="btn btn-outline-danger me-2" onclick="markAsHard()">
-                <i class="fas fa-times me-1"></i> Chưa nhớ
-            </button>
-            <button class="btn btn-outline-success me-2" onclick="markAsEasy()">
-                <i class="fas fa-check me-1"></i> Đã nhớ
-            </button>
-            <button class="btn btn-outline-primary" onclick="shuffleCards()">
-                <i class="fas fa-random me-1"></i> Xáo trộn
-            </button>
-        </div>
-        
-        <!-- Quick Actions -->
-        <div class="text-center mt-4">
-            <a href="#" id="btn-quiz" class="btn btn-primary-custom">
-                <i class="fas fa-clipboard-check me-1"></i> Làm Quiz
-            </a>
+            
+            <!-- Section 2: Học flashcard -->
+            <div id="section-study" style="display: none;">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="exitStudy()">
+                        <i class="fas fa-arrow-left me-1"></i>Thoát
+                    </button>
+                    <h5 class="mb-0" id="study-title">Đang học...</h5>
+                    <div class="d-none d-md-block">
+                        <span class="text-muted small">
+                            <span class="kbd">Space</span> lật
+                            <span class="kbd">←</span><span class="kbd">→</span> chuyển
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Progress -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span id="progress-text" class="text-muted">1 / 10</span>
+                        <div>
+                            <span class="stat-badge bg-success bg-opacity-10 text-success me-1" id="known-count">
+                                <i class="fas fa-check me-1"></i>0
+                            </span>
+                            <span class="stat-badge bg-danger bg-opacity-10 text-danger" id="unknown-count">
+                                <i class="fas fa-times me-1"></i>0
+                            </span>
+                        </div>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-primary" id="progress-bar" style="width: 10%"></div>
+                    </div>
+                </div>
+                
+                <!-- Flashcard -->
+                <div class="flashcard-container mb-4" onclick="flipCard()">
+                    <div class="flashcard" id="flashcard">
+                        <div class="flashcard-face flashcard-front">
+                            <span class="flashcard-label"><i class="fas fa-lightbulb me-1"></i>Khái niệm</span>
+                            <img id="card-image" class="flashcard-image" style="display: none;">
+                            <div class="flashcard-content" id="card-front">Loading...</div>
+                            <span class="flashcard-hint"><i class="fas fa-hand-pointer me-1"></i>Click để lật</span>
+                        </div>
+                        <div class="flashcard-face flashcard-back">
+                            <span class="flashcard-label"><i class="fas fa-book me-1"></i>Định nghĩa</span>
+                            <div class="flashcard-content" id="card-back">Loading...</div>
+                            <span class="flashcard-hint"><i class="fas fa-hand-pointer me-1"></i>Click để lật</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="d-flex justify-content-center align-items-center gap-3 mb-4">
+                    <button class="nav-btn" id="btn-prev" onclick="prevCard()">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="btn btn-outline-danger px-4" onclick="markUnknown()">
+                        <i class="fas fa-times me-1"></i>Chưa thuộc
+                    </button>
+                    <button class="btn btn-outline-success px-4" onclick="markKnown()">
+                        <i class="fas fa-check me-1"></i>Đã thuộc
+                    </button>
+                    <button class="nav-btn" id="btn-next" onclick="nextCard()">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Actions -->
+                <div class="text-center">
+                    <button class="btn btn-outline-primary btn-sm me-2" onclick="shuffleCards()">
+                        <i class="fas fa-random me-1"></i>Xáo trộn
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="restartStudy()">
+                        <i class="fas fa-redo me-1"></i>Học lại
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Section 3: Hoàn thành -->
+            <div id="section-complete" style="display: none;">
+                <div class="text-center py-4">
+                    <div class="completion-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h2 class="mb-2">Hoàn thành! 🎉</h2>
+                    <p class="text-muted mb-4">Bạn đã học xong bộ flashcard này</p>
+                    
+                    <!-- Stats -->
+                    <div class="d-flex justify-content-center gap-4 mb-4">
+                        <div class="stat-circle bg-success bg-opacity-10">
+                            <span class="fs-4 fw-bold text-success" id="final-known">0</span>
+                            <small class="text-success">Thuộc</small>
+                        </div>
+                        <div class="stat-circle bg-danger bg-opacity-10">
+                            <span class="fs-4 fw-bold text-danger" id="final-unknown">0</span>
+                            <small class="text-danger">Chưa</small>
+                        </div>
+                        <div class="stat-circle bg-primary bg-opacity-10">
+                            <span class="fs-4 fw-bold text-primary" id="final-percent">0%</span>
+                            <small class="text-primary">Tỷ lệ</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <button class="btn btn-outline-secondary" onclick="exitStudy()">
+                            <i class="fas fa-list me-1"></i>Chọn bộ khác
+                        </button>
+                        <button class="btn btn-outline-warning" onclick="studyUnknownOnly()" id="btn-study-unknown">
+                            <i class="fas fa-redo me-1"></i>Học lại thẻ chưa thuộc
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="restartStudy()">
+                            <i class="fas fa-sync me-1"></i>Học lại từ đầu
+                        </button>
+                        <a class="btn btn-success" id="btn-quiz" href="#">
+                            <i class="fas fa-clipboard-check me-1"></i>Làm Quiz
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </main>
 
@@ -85,170 +354,333 @@
     <script src="../js/app.js"></script>
     
     <script>
-        let studySetId;
+        // State
+        let selectedStudySetId = null;
+        let selectedStudySetName = '';
         let flashcards = [];
         let currentIndex = 0;
-        let isFlipped = false;
-        let remembered = new Set();
+        let knownCards = new Set();
+        let unknownCards = new Set();
         
         document.addEventListener('DOMContentLoaded', async function() {
             if (!Utils.requireAuth()) return;
             
-            studySetId = Utils.getUrlParam('id');
-            if (!studySetId) {
-                Utils.error('Không tìm thấy bộ học');
-                window.location.href = 'folders.html';
-                return;
+            // Check if studySetId in URL (support both 'id' and 'studySetId')
+            const urlId = Utils.getUrlParam('id') || Utils.getUrlParam('studySetId');
+            
+            if (urlId) {
+                // Học trực tiếp bộ này
+                await loadStudySetDirect(urlId);
+            } else {
+                // Hiển thị giao diện chọn bộ học
+                await loadFolders();
             }
             
-            document.getElementById('btn-quiz').href = `quiz.html?id=${studySetId}`;
-            
-            await loadStudySet();
-            await loadFlashcards();
-            
-            // Keyboard navigation
+            // Keyboard events
             document.addEventListener('keydown', handleKeyboard);
         });
         
-        async function loadStudySet() {
+        // ========== LOAD DATA ==========
+        
+        async function loadFolders() {
             try {
-                const data = await API.getStudySetById(studySetId);
-                document.getElementById('studyset-title').textContent = data.name;
+                const response = await API.getYourFolders(0, 100);
+                const folders = response.content || [];
+                
+                const select = document.getElementById('select-folder');
+                select.innerHTML = '<option value="">-- Chọn thư mục --</option>' +
+                    folders.map(f => `<option value="${f.folderId}">${Utils.escapeHtml(f.folderName)}</option>`).join('');
+                
+                select.addEventListener('change', onFolderChange);
             } catch (error) {
-                Utils.error('Không thể tải thông tin');
+                console.error('Error loading folders:', error);
+                Utils.error('Không thể tải danh sách thư mục');
             }
         }
         
-        async function loadFlashcards() {
+        async function onFolderChange() {
+            const folderId = document.getElementById('select-folder').value;
+            const listContainer = document.getElementById('studyset-list-container');
+            const emptyState = document.getElementById('empty-studyset');
+            const startBtn = document.getElementById('start-btn-container');
+            
+            selectedStudySetId = null;
+            startBtn.style.display = 'none';
+            
+            if (!folderId) {
+                listContainer.style.display = 'none';
+                emptyState.style.display = 'none';
+                return;
+            }
+            
             try {
-                const response = await API.getFlashcardsByStudySet(studySetId);
-                flashcards = response.content || [];
+                const response = await API.getStudySetsByFolder(folderId, 0, 100);
+                const studySets = response.content || [];
                 
-                if (flashcards.length === 0) {
-                    document.getElementById('flashcard-wrapper').innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon"><i class="fas fa-clone"></i></div>
-                            <h3>Chưa có thẻ nào</h3>
-                            <p>Bộ học này chưa có flashcard</p>
-                            <a href="studyset-detail.html?id=${studySetId}" class="btn btn-primary-custom">
-                                <i class="fas fa-plus me-1"></i> Thêm thẻ
-                            </a>
-                        </div>
-                    `;
+                if (studySets.length === 0) {
+                    listContainer.style.display = 'none';
+                    emptyState.style.display = 'block';
                     return;
                 }
                 
-                document.getElementById('studyset-info').textContent = `${flashcards.length} thẻ`;
-                updateCard();
-                updateProgress();
+                emptyState.style.display = 'none';
+                listContainer.style.display = 'block';
+                
+                document.getElementById('studyset-list').innerHTML = studySets.map(ss => `
+                    <div class="col-md-6">
+                        <div class="select-card" data-id="${ss.id}" data-name="${Utils.escapeHtml(ss.name)}" onclick="selectStudySet(this)">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="width: 45px; height: 45px; background: var(--gradient-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-layer-group text-white"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">${Utils.escapeHtml(ss.name)}</h6>
+                                    <small class="text-muted">Bộ học</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
             } catch (error) {
-                Utils.error('Không thể tải flashcard');
+                console.error('Error loading study sets:', error);
+                Utils.error('Không thể tải danh sách bộ học');
             }
         }
         
-        function updateCard() {
-            if (flashcards.length === 0) return;
+        function selectStudySet(element) {
+            // Remove previous selection
+            document.querySelectorAll('.select-card').forEach(c => c.classList.remove('selected'));
+            
+            // Select this one
+            element.classList.add('selected');
+            selectedStudySetId = element.dataset.id;
+            selectedStudySetName = element.dataset.name;
+            
+            // Show start button
+            document.getElementById('start-btn-container').style.display = 'block';
+        }
+        
+        async function loadStudySetDirect(studySetId) {
+            try {
+                const studySet = await API.getStudySetById(studySetId);
+                selectedStudySetId = studySetId;
+                selectedStudySetName = studySet.name;
+                await startStudy();
+            } catch (error) {
+                console.error('Error:', error);
+                Utils.error('Không thể tải bộ học');
+                // Show selection instead
+                await loadFolders();
+            }
+        }
+        
+        // ========== STUDY MODE ==========
+        
+        async function startStudy() {
+            if (!selectedStudySetId) {
+                Utils.warning('Vui lòng chọn một bộ học');
+                return;
+            }
+            
+            try {
+                const response = await API.getFlashcardsByStudySet(selectedStudySetId, 0, 200);
+                flashcards = response.content || [];
+                
+                if (flashcards.length === 0) {
+                    Utils.warning('Bộ học này chưa có thẻ nào!');
+                    return;
+                }
+                
+                // Reset state
+                currentIndex = 0;
+                knownCards = new Set();
+                unknownCards = new Set();
+                
+                // Update UI
+                document.getElementById('section-select').style.display = 'none';
+                document.getElementById('section-study').style.display = 'block';
+                document.getElementById('section-complete').style.display = 'none';
+                
+                document.getElementById('study-title').textContent = selectedStudySetName;
+                document.getElementById('btn-quiz').href = `quiz.html?studySetId=${selectedStudySetId}`;
+                
+                showCard();
+                
+            } catch (error) {
+                console.error('Error starting study:', error);
+                Utils.error('Không thể bắt đầu học');
+            }
+        }
+        
+        function showCard() {
+            if (currentIndex >= flashcards.length) {
+                showCompletion();
+                return;
+            }
             
             const card = flashcards[currentIndex];
-            document.getElementById('card-front').textContent = card.concept;
-            document.getElementById('card-back').textContent = card.define;
-            document.getElementById('counter').textContent = `${currentIndex + 1} / ${flashcards.length}`;
             
             // Reset flip
-            isFlipped = false;
             document.getElementById('flashcard').classList.remove('flipped');
             
-            // Update navigation buttons
-            document.getElementById('btn-prev').disabled = currentIndex === 0;
-            document.getElementById('btn-next').disabled = currentIndex === flashcards.length - 1;
+            // Update content
+            document.getElementById('card-front').textContent = card.concept || '';
+            document.getElementById('card-back').textContent = card.define || '';
+            
+            // Image
+            const img = document.getElementById('card-image');
+            if (card.imageSource) {
+                img.src = CONFIG.API_BASE_URL + card.imageSource;
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+            }
             
             updateProgress();
         }
         
         function updateProgress() {
-            const percent = Math.round(((currentIndex + 1) / flashcards.length) * 100);
-            document.getElementById('progress-text').textContent = `Thẻ ${currentIndex + 1} / ${flashcards.length}`;
-            document.getElementById('progress-percent').textContent = `${percent}%`;
+            const total = flashcards.length;
+            const current = currentIndex + 1;
+            const percent = Math.round((current / total) * 100);
+            
+            document.getElementById('progress-text').textContent = `${current} / ${total}`;
             document.getElementById('progress-bar').style.width = `${percent}%`;
+            document.getElementById('known-count').innerHTML = `<i class="fas fa-check me-1"></i>${knownCards.size}`;
+            document.getElementById('unknown-count').innerHTML = `<i class="fas fa-times me-1"></i>${unknownCards.size}`;
+            
+            document.getElementById('btn-prev').disabled = currentIndex === 0;
         }
         
         function flipCard() {
-            isFlipped = !isFlipped;
             document.getElementById('flashcard').classList.toggle('flipped');
         }
         
         function nextCard() {
             if (currentIndex < flashcards.length - 1) {
                 currentIndex++;
-                updateCard();
+                showCard();
+            } else {
+                showCompletion();
             }
         }
         
         function prevCard() {
             if (currentIndex > 0) {
                 currentIndex--;
-                updateCard();
+                showCard();
             }
         }
         
-        function markAsEasy() {
-            remembered.add(flashcards[currentIndex].id);
-            Utils.success('Đã đánh dấu "Đã nhớ"');
-            if (currentIndex < flashcards.length - 1) {
-                nextCard();
-            }
+        function markKnown() {
+            const cardId = flashcards[currentIndex].id;
+            knownCards.add(cardId);
+            unknownCards.delete(cardId);
+            nextCard();
         }
         
-        function markAsHard() {
-            remembered.delete(flashcards[currentIndex].id);
-            Utils.info('Đã đánh dấu "Chưa nhớ"');
-            if (currentIndex < flashcards.length - 1) {
-                nextCard();
-            }
+        function markUnknown() {
+            const cardId = flashcards[currentIndex].id;
+            unknownCards.add(cardId);
+            knownCards.delete(cardId);
+            nextCard();
         }
         
         function shuffleCards() {
-            flashcards = Utils.shuffleArray(flashcards);
+            for (let i = flashcards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+            }
             currentIndex = 0;
-            updateCard();
+            knownCards = new Set();
+            unknownCards = new Set();
+            showCard();
             Utils.success('Đã xáo trộn thẻ!');
         }
         
+        function restartStudy() {
+            currentIndex = 0;
+            knownCards = new Set();
+            unknownCards = new Set();
+            
+            document.getElementById('section-study').style.display = 'block';
+            document.getElementById('section-complete').style.display = 'none';
+            
+            showCard();
+        }
+        
+        function studyUnknownOnly() {
+            if (unknownCards.size === 0) {
+                Utils.info('Không có thẻ nào chưa thuộc!');
+                return;
+            }
+            
+            flashcards = flashcards.filter(c => unknownCards.has(c.id));
+            currentIndex = 0;
+            knownCards = new Set();
+            unknownCards = new Set();
+            
+            document.getElementById('section-study').style.display = 'block';
+            document.getElementById('section-complete').style.display = 'none';
+            
+            showCard();
+            Utils.info(`Học lại ${flashcards.length} thẻ`);
+        }
+        
+        function showCompletion() {
+            document.getElementById('section-study').style.display = 'none';
+            document.getElementById('section-complete').style.display = 'block';
+            
+            const total = flashcards.length;
+            const known = knownCards.size;
+            const unknown = unknownCards.size;
+            const percent = total > 0 ? Math.round((known / total) * 100) : 0;
+            
+            document.getElementById('final-known').textContent = known;
+            document.getElementById('final-unknown').textContent = unknown;
+            document.getElementById('final-percent').textContent = percent + '%';
+            
+            document.getElementById('btn-study-unknown').style.display = unknown > 0 ? 'inline-block' : 'none';
+        }
+        
+        function exitStudy() {
+            document.getElementById('section-select').style.display = 'block';
+            document.getElementById('section-study').style.display = 'none';
+            document.getElementById('section-complete').style.display = 'none';
+            
+            // Clear URL params
+            window.history.replaceState({}, '', window.location.pathname);
+            
+            // Reload folders if needed
+            if (document.getElementById('select-folder').options.length <= 1) {
+                loadFolders();
+            }
+        }
+        
         function handleKeyboard(e) {
+            if (document.getElementById('section-study').style.display === 'none') return;
+            
             switch(e.key) {
+                case ' ':
+                case 'Enter':
+                    e.preventDefault();
+                    flipCard();
+                    break;
                 case 'ArrowLeft':
                     prevCard();
                     break;
                 case 'ArrowRight':
                     nextCard();
                     break;
-                case ' ':
-                case 'Enter':
-                    e.preventDefault();
-                    flipCard();
-                    break;
                 case '1':
-                    markAsHard();
+                    markUnknown();
                     break;
                 case '2':
-                    markAsEasy();
+                    markKnown();
                     break;
             }
         }
     </script>
-    
-    <style>
-        .main-content {
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            padding-top: 2rem;
-        }
-        @media (min-width: 992px) {
-            .main-content {
-                margin-left: calc(260px + (100% - 260px - 800px) / 2);
-            }
-        }
-    </style>
 </body>
 </html>
