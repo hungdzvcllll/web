@@ -156,9 +156,17 @@
                             <div class="card-body">
                                 <div class="studyset-header">
                                     <div class="studyset-icon"><i class="fas fa-layer-group"></i></div>
-                                    <div class="studyset-info">
+                                    <div class="studyset-info flex-grow-1">
                                         <h5>${Utils.escapeHtml(ss.name)}</h5>
                                         <span>Bộ học</span>
+                                    </div>
+                                    <div class="dropdown" onclick="event.stopPropagation()">
+                                        <button class="btn btn-sm btn-link text-muted p-0" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item text-danger" href="#" onclick="deleteStudySet(${ss.id}, '${Utils.escapeHtml(ss.name)}')"><i class="fas fa-trash me-2"></i>Xóa</a></li>
+                                        </ul>
                                     </div>
                                 </div>
                                 <div class="d-flex gap-2 mt-3">
@@ -209,6 +217,20 @@
         
         function showCreateStudySetModal() { createStudySetModal.show(); }
         function showInviteModal() { inviteModal.show(); }
+        
+        // Thêm function xóa study set
+        async function deleteStudySet(id, name) {
+            if (!confirm(`Bạn có chắc muốn xóa bộ học "${name}"?\nTất cả thẻ flashcard trong bộ học cũng sẽ bị xóa!`)) {
+                return;
+            }
+            try {
+                await API.deleteStudySet(id);
+                Utils.success('Đã xóa bộ học thành công!');
+                loadStudySets();
+            } catch (error) {
+                Utils.error(error.message || 'Không thể xóa bộ học');
+            }
+        }
     </script>
 </body>
 </html>

@@ -23,6 +23,7 @@ const CONFIG = {
         FOLDER_SAVE_PERSONAL: '/folder/savePersonalFolder',
         FOLDER_SAVE_CLASS: '/folder/saveClassFolder',
         FOLDER_UPDATE: '/folder/update',
+        FOLDER_DELETE: '/folder/delete',
         FOLDER_FIND_BY_ID: '/folder/findById',
         FOLDER_FIND_BY_NAME: '/folder/findByName',
         FOLDER_FIND_CLASS: '/folder/findClassFolder',
@@ -33,6 +34,7 @@ const CONFIG = {
         
         // Study Set
         STUDYSET_CREATE: '/studySet/create',
+        STUDYSET_DELETE: '/studySet/delete',
         STUDYSET_FIND_BY_ID: '/studySet/findById',
         STUDYSET_FIND_BY_FOLDER: '/studySet/findByFolderId',
         
@@ -51,6 +53,7 @@ const CONFIG = {
         
         // Class
         CLASS_CREATE: '/class/create',
+        CLASS_DELETE: '/class/delete',
         CLASS_FIND_BY_ID: '/class/findById',
         
         // User In Class

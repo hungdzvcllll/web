@@ -35,4 +35,11 @@ public class StudySetService {
         
         return studySetRepo.findByFolder(new Folder(folderId), null).map(mapper::toDTO);
     }
+
+    public void delete(Integer id) {
+        StudySet set = studySetRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("StudySet not found"));
+        folderService.checkIfYouCanAccessFolder(set.getFolder().getId());
+        studySetRepo.deleteById(id);
+    }
 }

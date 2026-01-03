@@ -82,4 +82,11 @@ public class FolderService {
     public Page<FolderResponse> findPublicByName(String name,Pageable pageable){
         return folderRepo.findByIsPrivateAndName(false,name,pageable).map(folderMapper::toDTO);
     }
+    
+    public void delete(Integer id) {
+        afService.checkCreate(id);
+        Folder folder = folderRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("folder not exist"));
+        folderRepo.delete(folder);
+    }
 }

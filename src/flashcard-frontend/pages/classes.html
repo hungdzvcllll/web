@@ -98,14 +98,24 @@
                 container.innerHTML = classes.map(cls => `
                     <div class="col-sm-6 col-lg-4">
                         <div class="card-custom class-card h-100" onclick="location.href='class-detail.html?id=${cls.classId}'">
-                            <div class="class-banner"></div>
+                            <div class="class-banner">
+                                <div class="dropdown position-absolute top-0 end-0 m-2" onclick="event.stopPropagation()">
+                                    ${cls.role === 'TEACHER' ? `
+                                    <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteClass(${cls.classId}, '${Utils.escapeHtml(cls.className)}')"><i class="fas fa-trash me-2"></i>Xóa</a></li>
+                                    </ul>
+                                    ` : ''}
+                                </div>
+                            </div>
                             <div class="class-avatar"><i class="fas fa-users"></i></div>
                             <div class="class-body">
                                 <h5 class="class-name">${Utils.escapeHtml(cls.className)}</h5>
-                                <p class="class-teacher">${cls.role === 'TEACHER' ? 'Bạn là giáo viên' : 'Bạn là học sinh'}</p>
-                                <div class="class-stats">
-                                    <span class="badge ${cls.role === 'TEACHER' ? 'badge-primary' : 'badge-success'}">${cls.role === 'TEACHER' ? 'Giáo viên' : 'Học sinh'}</span>
-                                </div>
+                                <p class="class-role">${cls.role === 'TEACHER' ? 'Bạn là giáo viên' : 'Bạn là học sinh'}</p>
+                                <span class="badge ${cls.role === 'TEACHER' ? 'badge-teacher' : 'badge-student'}">${cls.role === 'TEACHER' ? 'Giáo viên' : 'Học sinh'}</span>
+                                <div class="class-members"><i class="fas fa-user-friends"></i></div>
                             </div>
                         </div>
                     </div>
@@ -133,6 +143,20 @@
         }
         
         function showCreateClassModal() { createClassModal.show(); }
+        
+        // Thêm function xóa class
+        async function deleteClass(id, name) {
+            if (!confirm(`Bạn có chắc muốn xóa lớp học "${name}"?\nTất cả thư mục và bộ học trong lớp cũng sẽ bị xóa!`)) {
+                return;
+            }
+            try {
+                await API.deleteClass(id);
+                Utils.success('Đã xóa lớp học thành công!');
+                loadClasses();
+            } catch (error) {
+                Utils.error(error.message || 'Không thể xóa lớp học');
+            }
+        }
     </script>
 </body>
 </html>

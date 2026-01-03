@@ -3,6 +3,7 @@ package com.web.web.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -81,6 +82,13 @@ public class FolderController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-    
-    
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> delete(@RequestParam("id") Integer id) {
+        try {
+            folderService.delete(id);
+            return ResponseEntity.ok("deleted");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

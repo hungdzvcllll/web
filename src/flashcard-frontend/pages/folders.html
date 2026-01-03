@@ -143,10 +143,22 @@
                     <div class="col-sm-6 col-lg-4 col-xl-3">
                         <div class="card-custom folder-card h-100" onclick="location.href='folder-detail.html?id=${f.folderId}'">
                             <div class="card-body">
-                                <span class="badge ${f.role === 'CREATE' ? 'badge-primary' : 'badge-success'} folder-badge">${f.role === 'CREATE' ? 'Của tôi' : 'Được mời'}</span>
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="badge ${f.role === 'CREATE' ? 'badge-primary' : 'badge-success'} folder-badge">${f.role === 'CREATE' ? 'Của tôi' : 'Được mời'}</span>
+                                    ${f.role === 'CREATE' ? `
+                                    <div class="dropdown" onclick="event.stopPropagation()">
+                                        <button class="btn btn-sm btn-link text-muted p-0" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item text-danger" href="#" onclick="deleteFolder(${f.folderId}, '${Utils.escapeHtml(f.folderName)}')"><i class="fas fa-trash me-2"></i>Xóa</a></li>
+                                        </ul>
+                                    </div>
+                                    ` : ''}
+                                </div>
                                 <div class="folder-icon"><i class="fas fa-folder"></i></div>
-                                <h5 class="folder-name">${Utils.escapeHtml(f.folderName)}</h5>
-                                <p class="folder-count"><i class="fas fa-layer-group me-1"></i> Bộ học liệu</p>
+                                <h5 class="folder-title">${Utils.escapeHtml(f.folderName)}</h5>
+                                <p class="folder-meta"><i class="fas fa-layer-group me-1"></i> Bộ học liệu</p>
                             </div>
                         </div>
                     </div>
@@ -187,6 +199,19 @@
         }
         
         function showCreateFolderModal() { createFolderModal.show(); }
+        // Thêm function xóa folder
+        async function deleteFolder(id, name) {
+            if (!confirm(`Bạn có chắc muốn xóa thư mục "${name}"?\nTất cả bộ học trong thư mục cũng sẽ bị xóa!`)) {
+                return;
+            }
+            try {
+                await API.deleteFolder(id);
+                Utils.success('Đã xóa thư mục thành công!');
+                loadFolders(currentPage);
+            } catch (error) {
+                Utils.error(error.message || 'Không thể xóa thư mục');
+            }
+        }
     </script>
 </body>
 </html>

@@ -26,4 +26,10 @@ public class ClassService {
         uInClassService.checkIfYouAreInClass(c);
         return mapper.toDTO(c);
     }
+    
+    public void delete(Integer id){
+        Class c = classRepo.findById(id).orElseThrow(() -> new RuntimeException("Class not found"));
+        uInClassService.checkIfYouAreInClass(c);
+        classRepo.deleteById(id);
+    }
 }

@@ -247,7 +247,7 @@ const API = {
     },
 
     // ==================== FOLDER ====================
-    
+
     async createPersonalFolder(name, isPrivate) {
         return this.postParams(CONFIG.API.FOLDER_SAVE_PERSONAL, { name, isPrivate });
     },
@@ -280,8 +280,12 @@ const API = {
         return this.postParams(CONFIG.API.ACCESS_FOLDER_INVITE, { userId, folderId });
     },
 
+    async deleteFolder(id) {
+        return this.delete(CONFIG.API.FOLDER_DELETE, { id });
+    },
+
     // ==================== STUDY SET ====================
-    
+
     async createStudySet(folderId, name) {
         return this.postParams(CONFIG.API.STUDYSET_CREATE, { folderId, name });
     },
@@ -292,6 +296,10 @@ const API = {
 
     async getStudySetsByFolder(folderId, page = 0, size = CONFIG.DEFAULT_PAGE_SIZE) {
         return this.get(CONFIG.API.STUDYSET_FIND_BY_FOLDER, { folderId, page, size });
+    },
+
+    async deleteStudySet(id) {
+        return this.delete(CONFIG.API.STUDYSET_DELETE, { id });
     },
 
     // ==================== FLASHCARD (STUDY SET ITEM) ====================
@@ -366,7 +374,7 @@ const API = {
     },
 
     // ==================== CLASS ====================
-    
+
     async createClass(name) {
         return this.postParams(CONFIG.API.CLASS_CREATE, { name });
     },
@@ -389,6 +397,10 @@ const API = {
 
     async removeStudentFromClass(userId, classId) {
         return this.delete(CONFIG.API.USER_IN_CLASS_DELETE, { userId, classId });
+    },
+
+    async deleteClass(id) {
+        return this.delete(CONFIG.API.CLASS_DELETE, { id });
     },
 
     // ==================== NOTIFICATION ====================
