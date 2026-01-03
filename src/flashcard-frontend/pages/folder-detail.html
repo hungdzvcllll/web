@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết thư mục - FlashCard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="navbar-container"></div>
+    <div id="sidebar-container"></div>
+    
+    <main class="main-content">
+        <div class="page-header">
+            <nav class="breadcrumb-custom"><ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="dashboard.html">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="folders.html">Thư mục</a></li>
+                <li class="breadcrumb-item active" id="breadcrumb-name">Loading...</li>
+            </ol></nav>
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div>
+                    <h1 id="folder-title"><i class="fas fa-folder text-warning me-2"></i>Loading...</h1>
+                    <p id="folder-description">Đang tải thông tin...</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-custom" onclick="showInviteModal()">
+                        <i class="fas fa-user-plus me-1"></i> Mời
+                    </button>
+                    <button class="btn btn-primary-custom" onclick="showCreateStudySetModal()">
+                        <i class="fas fa-plus me-1"></i> Tạo bộ học
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="studysets-container" class="row g-4">
+            <div class="col-12"><div class="loading-spinner"><div class="spinner"></div></div></div>
+        </div>
+        <div id="pagination-container" class="mt-4"></div>
+    </main>
+    
+    <!-- Create Study Set Modal -->
+    <div class="modal fade modal-custom" id="createStudySetModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tạo bộ học mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="create-studyset-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="studyset-name" class="form-label">Tên bộ học</label>
+                            <input type="text" class="form-control" id="studyset-name" placeholder="Ví dụ: Từ vựng TOEIC" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary-custom"><i class="fas fa-plus me-1"></i> Tạo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Invite Modal -->
+    <div class="modal fade modal-custom" id="inviteModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Mời người dùng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="invite-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="invite-user-id" class="form-label">ID người dùng</label>
+                            <input type="number" class="form-control" id="invite-user-id" placeholder="Nhập ID người dùng" required>
+                        </div>
+                        <div class="alert alert-info small">
+                            <i class="fas fa-info-circle me-1"></i> Người được mời sẽ có quyền xem và học các bộ flashcard trong thư mục này.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary-custom"><i class="fas fa-paper-plane me-1"></i> Mời</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+    
+    <script>
+        let createStudySetModal, inviteModal;
+        let folderId, folderData;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!Utils.requireAuth()) return;
+            
+            folderId = Utils.getUrlParam('id');
+            if (!folderId) {
+                Utils.error('Không tìm thấy thư mục');
+                window.location.href = 'folders.html';
+                return;
+            }
+            
+            createStudySetModal = new bootstrap.Modal(document.getElementById('createStudySetModal'));
+            inviteModal = new bootstrap.Modal(document.getElementById('inviteModal'));
+            
+            await loadFolderDetail();
+            await loadStudySets();
+            setupEventListeners();
+        });
+        
+        async function loadFolderDetail() {
+            try {
+                folderData = await API.getFolderById(folderId);
+                document.getElementById('folder-title').innerHTML = `<i class="fas fa-folder text-warning me-2"></i>${Utils.escapeHtml(folderData.name)}`;
+                document.getElementById('breadcrumb-name').textContent = folderData.name;
+                document.getElementById('folder-description').textContent = folderData.isPrivate ? '🔒 Thư mục riêng tư' : '🌐 Thư mục công khai';
+            } catch (error) {
+                Utils.error('Không thể tải thông tin thư mục');
+            }
+        }
+        
+        async function loadStudySets(page = 0) {
+            const container = document.getElementById('studysets-container');
+            container.innerHTML = '<div class="col-12"><div class="loading-spinner"><div class="spinner"></div></div></div>';
+            
+            try {
+                const response = await API.getStudySetsByFolder(folderId, page, 12);
+                const studySets = response.content || [];
+                
+                if (studySets.length === 0) {
+                    container.innerHTML = `<div class="col-12"><div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-layer-group"></i></div>
+                        <h3>Chưa có bộ học nào</h3>
+                        <p>Tạo bộ học đầu tiên trong thư mục này</p>
+                        <button class="btn btn-primary-custom" onclick="showCreateStudySetModal()"><i class="fas fa-plus me-1"></i> Tạo bộ học</button>
+                    </div></div>`;
+                    return;
+                }
+                
+                container.innerHTML = studySets.map(ss => `
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card-custom studyset-card h-100" onclick="location.href='studyset-detail.html?id=${ss.id}'">
+                            <div class="card-body">
+                                <div class="studyset-header">
+                                    <div class="studyset-icon"><i class="fas fa-layer-group"></i></div>
+                                    <div class="studyset-info">
+                                        <h5>${Utils.escapeHtml(ss.name)}</h5>
+                                        <span>Bộ học</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 mt-3">
+                                    <button class="btn btn-sm btn-outline-primary flex-fill" onclick="event.stopPropagation(); location.href='study.html?id=${ss.id}'">
+                                        <i class="fas fa-graduation-cap me-1"></i> Học
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success flex-fill" onclick="event.stopPropagation(); location.href='quiz.html?id=${ss.id}'">
+                                        <i class="fas fa-clipboard-check me-1"></i> Quiz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                Utils.renderPagination('#pagination-container', page, response.totalPages, loadStudySets);
+            } catch (error) {
+                container.innerHTML = '<div class="col-12"><p class="text-center text-muted">Không thể tải dữ liệu</p></div>';
+            }
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('create-studyset-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const name = document.getElementById('studyset-name').value.trim();
+                if (!name) { Utils.error('Vui lòng nhập tên'); return; }
+                try {
+                    await API.createStudySet(folderId, name);
+                    Utils.success('Tạo bộ học thành công!');
+                    createStudySetModal.hide();
+                    document.getElementById('studyset-name').value = '';
+                    loadStudySets();
+                } catch (error) { Utils.error(error.message || 'Lỗi'); }
+            });
+            
+            document.getElementById('invite-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const userId = document.getElementById('invite-user-id').value;
+                if (!userId) { Utils.error('Vui lòng nhập ID'); return; }
+                try {
+                    await API.inviteToFolder(userId, folderId);
+                    Utils.success('Mời thành công!');
+                    inviteModal.hide();
+                    document.getElementById('invite-user-id').value = '';
+                } catch (error) { Utils.error(error.message || 'Lỗi'); }
+            });
+        }
+        
+        function showCreateStudySetModal() { createStudySetModal.show(); }
+        function showInviteModal() { inviteModal.show(); }
+    </script>
+</body>
+</html>
