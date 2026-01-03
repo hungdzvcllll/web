@@ -33,37 +33,69 @@ public class StudySetItemService {
     StudySetItemRepository itemRepo;
     @Autowired
     StudySetItemMapper mapper;
-    public void addItems(StudySetItemRequest itemRequest,Integer studySetId)throws Exception{
-        StudySet set=setRepo.findById(studySetId).get();
+
+    public void addItems(StudySetItemRequest itemRequest, Integer studySetId) throws Exception {
+        StudySet set = setRepo.findById(studySetId).get();
         folderService.checkIfYouCanAccessFolder(set.getFolder().getId());
-       
-            StudySetItem item=new StudySetItem(null,itemRequest.getConcept(),itemRequest.getDefine(),
-            fileService.saveFile(itemRequest.getImage(),"studySetItem/"),set);
-            itemRepo.save(item);
-        
+
+        String imageSource = null;
+        if (itemRequest.getImage() != null && !itemRequest.getImage().isEmpty()) {
+            imageSource = fileService.saveFile(itemRequest.getImage(), "studySetItem/");
+        }
+
+        StudySetItem item = new StudySetItem(null, itemRequest.getConcept(), itemRequest.getDefine(),
+                imageSource, set);
+        itemRepo.save(item);
     }
-    public void deleteItems(Integer id)throws Exception{
-        StudySetItem item=itemRepo.findById(id).get();
+
+    public void deleteItems(Integer id) throws Exception {
+        StudySetItem item = itemRepo.findById(id).get();
         folderService.checkIfYouCanAccessFolder(item.getStudySet().getFolder().getId());
-        Files.delete(fileService.getFullPathFromLink(item.getImageSource()));
-        folderService.checkIfYouCanAccessFolder(item.getStudySet().getFolder().getId());
+        
+        // Chỉ xóa file nếu có imageSource
+        if (item.getImageSource() != null && !item.getImageSource().isEmpty()) {
+            try {
+                Files.delete(fileService.getFullPathFromLink(item.getImageSource()));
+            } catch (Exception e) {
+                // Ignore if file doesn't exist
+            }
+        }
+        
         itemRepo.deleteById(id);
     }
-    public void update(StudySetItemRequest itemRequest,Integer id)throws Exception{
-        StudySetItem item=itemRepo.findById(id).get();
+
+    public void update(StudySetItemRequest itemRequest, Integer id) throws Exception {
+        StudySetItem item = itemRepo.findById(id).get();
         folderService.checkIfYouCanAccessFolder(item.getStudySet().getFolder().getId());
-        mapper.updateEntityFromDto(itemRequest,item);
-        Files.delete(fileService.getFullPathFromLink(item.getImageSource()));
-        item.setImageSource(fileService.saveFile(itemRequest.getImage(),"studySetItem/"));
-        itemRepo.save(item);        
+        
+        // Cập nhật concept và define
+        item.setConcept(itemRequest.getConcept());
+        item.setDefine(itemRequest.getDefine());
+        
+        // Chỉ xử lý image nếu có upload mới
+        if (itemRequest.getImage() != null && !itemRequest.getImage().isEmpty()) {
+            // Xóa image cũ nếu có
+            if (item.getImageSource() != null && !item.getImageSource().isEmpty()) {
+                try {
+                    Files.delete(fileService.getFullPathFromLink(item.getImageSource()));
+                } catch (Exception e) {
+                    // Ignore if file doesn't exist
+                }
+            }
+            // Lưu image mới
+            item.setImageSource(fileService.saveFile(itemRequest.getImage(), "studySetItem/"));
+        }
+        
+        itemRepo.save(item);
     }
-    public Page<StudySetItemResponse> findByStudySet(Integer studySetId,Pageable pageable){
-        StudySet set=setRepo.findById(studySetId).get();
+
+    public Page<StudySetItemResponse> findByStudySet(Integer studySetId, Pageable pageable) {
+        StudySet set = setRepo.findById(studySetId).get();
         folderService.checkIfYouCanAccessFolder(set.getFolder().getId());
-        return itemRepo.findByStudySet(set,pageable).map(mapper::toDTO);
+        return itemRepo.findByStudySet(set, pageable).map(mapper::toDTO);
     }
-    public StudySetItemResponse findById(Integer id){
+
+    public StudySetItemResponse findById(Integer id) {
         return mapper.toDTO(itemRepo.findById(id).get());
     }
-    
 }

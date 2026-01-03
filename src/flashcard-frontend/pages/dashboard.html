@@ -81,7 +81,7 @@
                         </button>
                     </div>
                     <div class="col-6 col-md-3">
-                        <button class="btn btn-outline-custom w-100 py-3" onclick="window.location.href='create-studyset.html'">
+                        <button class="btn btn-outline-custom w-100 py-3" onclick="openCreateStudySetModal()">
                             <i class="fas fa-plus-circle d-block mb-2 fs-4"></i>
                             <span>Tạo bộ học</span>
                         </button>
@@ -199,6 +199,44 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tạo Bộ Học -->
+    <div class="modal fade" id="createStudySetModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-layer-group text-primary me-2"></i>
+                        Tạo bộ học mới
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Chọn thư mục <span class="text-danger">*</span></label>
+                        <select class="form-select" id="studySetFolder" required>
+                            <option value="">-- Chọn thư mục --</option>
+                        </select>
+                        <div class="form-text">Bộ học sẽ được lưu trong thư mục này</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tên bộ học <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="studySetName" placeholder="Ví dụ: Từ vựng Unit 1" required>
+                    </div>
+                    <div class="alert alert-info small mb-0">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Sau khi tạo bộ học, bạn có thể thêm các thẻ flashcard vào.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="submitCreateStudySet()">
+                        <i class="fas fa-plus me-1"></i> Tạo bộ học
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -387,6 +425,64 @@
         
         function showCreateClassModal() {
             createClassModal.show();
+        }
+        
+        async function openCreateStudySetModal() {
+            try {
+                const response = await API.getYourFolders(0, 100);
+                const folders = response.content || [];
+                
+                if (folders.length === 0) {
+                    Utils.warning('Bạn cần tạo thư mục trước khi tạo bộ học');
+                    showCreateFolderModal();
+                    return;
+                }
+                
+                const select = document.getElementById('studySetFolder');
+                select.innerHTML = '<option value="">-- Chọn thư mục --</option>' + 
+                    folders.map(f => `<option value="${f.folderId}">${Utils.escapeHtml(f.folderName)}</option>`).join('');
+                
+                // Reset form
+                document.getElementById('studySetName').value = '';
+                
+                // Hiển thị modal
+                const modal = new bootstrap.Modal(document.getElementById('createStudySetModal'));
+                modal.show();
+            } catch (error) {
+                console.error('Error loading folders:', error);
+                Utils.error('Không thể tải danh sách thư mục');
+            }
+        }
+
+        async function submitCreateStudySet() {
+            const folderId = document.getElementById('studySetFolder').value;
+            const name = document.getElementById('studySetName').value.trim();
+            
+            if (!folderId) {
+                Utils.error('Vui lòng chọn thư mục');
+                return;
+            }
+            
+            if (!name) {
+                Utils.error('Vui lòng nhập tên bộ học');
+                return;
+            }
+            
+            try {
+                await API.createStudySet(folderId, name);
+                
+                // Đóng modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('createStudySetModal'));
+                modal.hide();
+                
+                Utils.success('Tạo bộ học thành công!');
+                
+                // Redirect đến trang thư mục để xem bộ học mới
+                window.location.href = `folder-detail.html?id=${folderId}`;
+            } catch (error) {
+                console.error('Error creating study set:', error);
+                Utils.error(error.message || 'Không thể tạo bộ học');
+            }
         }
     </script>
     

@@ -310,10 +310,19 @@ const API = {
         const formData = new FormData();
         formData.append('concept', concept);
         formData.append('define', define);
-        if (image) {
+        if (image && image instanceof File) {
             formData.append('image', image);
         }
-        return this.postFormData(CONFIG.API.ITEM_UPDATE, formData, { id });
+        
+        const response = await fetch(`${CONFIG.API_BASE_URL}${CONFIG.API.ITEM_UPDATE}?id=${id}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${this.getToken()}`
+            },
+            body: formData
+        });
+        
+        return this.handleResponse(response);
     },
 
     async deleteFlashcard(studySetId) {
