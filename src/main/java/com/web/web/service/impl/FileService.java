@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileService {
     public String saveFile(MultipartFile file, String subDirectory) throws IOException, java.io.IOException {
         // Lấy tên file và làm sạch tên file
-        if(file.isEmpty())
+        if(file==null||file.isEmpty())
             return null;
         String fileName = StringUtils.cleanPath(UUID.randomUUID().toString()+file.getOriginalFilename());
         // Xác định thư mục upload

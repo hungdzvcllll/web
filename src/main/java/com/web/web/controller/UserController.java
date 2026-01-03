@@ -86,6 +86,7 @@ public class UserController {
             return ResponseEntity.ok("please check your email to get confirm register code");
         }
         catch(Exception e){
+            e.printStackTrace();
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
