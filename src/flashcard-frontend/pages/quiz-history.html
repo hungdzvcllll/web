@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử kiểm tra - FlashCard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="navbar-container"></div>
+    <div id="sidebar-container"></div>
+    <main class="main-content">
+        <div class="container py-4">
+            <!-- Header -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1"><i class="fas fa-history me-2"></i>Lịch sử kiểm tra</h2>
+                    <div class="text-muted">Xem lại các bài kiểm tra đã làm và theo dõi tiến độ học tập</div>
+                </div>
+            </div>
+
+            <!-- VIP Required Message (hidden by default) -->
+            <div id="vip-required" class="alert alert-warning d-none text-center py-4 mb-4" style="border-radius: 12px;">
+                <i class="fas fa-crown fa-2x mb-2 text-warning"></i>
+                <h4 class="fw-bold mt-2">Tính năng dành cho VIP</h4>
+                <p class="mb-3">Nâng cấp VIP để xem lịch sử kiểm tra và thống kê học tập chi tiết</p>
+                <a href="vip.html" class="btn btn-warning px-4 fw-bold">
+                    <i class="fas fa-bolt me-2"></i>Nâng cấp VIP ngay
+                </a>
+            </div>
+
+            <!-- Content (shown when VIP) -->
+            <div id="history-content" class="d-none">
+                <!-- Stats Row -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm text-center py-3">
+                            <div class="mb-2"><i class="fas fa-clipboard-check fa-lg text-primary"></i></div>
+                            <div class="fs-3 fw-bold" id="total-tests">0</div>
+                            <div class="text-muted">Tổng bài kiểm tra</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm text-center py-3">
+                            <div class="mb-2"><i class="fas fa-percentage fa-lg text-success"></i></div>
+                            <div class="fs-3 fw-bold" id="avg-score">0%</div>
+                            <div class="text-muted">Điểm trung bình</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm text-center py-3">
+                            <div class="mb-2"><i class="fas fa-trophy fa-lg text-warning"></i></div>
+                            <div class="fs-3 fw-bold" id="best-score">0%</div>
+                            <div class="text-muted">Điểm cao nhất</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm text-center py-3">
+                            <div class="mb-2"><i class="fas fa-fire fa-lg text-info"></i></div>
+                            <div class="fs-3 fw-bold" id="streak">0</div>
+                            <div class="text-muted">Chuỗi ngày học</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Table -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Danh sách bài kiểm tra</h5>
+                        <select class="form-select form-select-sm" id="filter-studyset" style="width: auto; max-width: 200px;">
+                            <option value="">Tất cả bộ học</option>
+                        </select>
+                    </div>
+                    <div id="history-list" class="card-body p-0">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <p class="mt-2 text-muted">Đang kiểm tra quyền truy cập...</p>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+
+    <script>
+        let allTests = [];
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!API.getToken()) {
+                window.location.href = 'login.html';
+                return;
+            }
+            await checkVipAndLoadData();
+        });
+
+        async function checkVipAndLoadData() {
+            try {
+                const response = await loadQuizHistory();
+                document.getElementById('loading').classList.add('d-none');
+                document.getElementById('vip-required').classList.add('d-none');
+                document.getElementById('history-content').classList.remove('d-none');
+            } catch (error) {
+                document.getElementById('loading').classList.add('d-none');
+                document.getElementById('vip-required').classList.remove('d-none');
+                document.getElementById('history-content').classList.add('d-none');
+            }
+        }
+
+        async function loadQuizHistory() {
+            const foldersResponse = await API.getYourFolders(0, 100);
+            const folders = foldersResponse.content || [];
+            allTests = [];
+            for (const folder of folders) {
+                try {
+                    const studySetsResponse = await API.getStudySetsByFolder(folder.folderId, 0, 100);
+                    const studySets = studySetsResponse.content || [];
+                    for (const studySet of studySets) {
+                        try {
+                            const testsResponse = await API.getTestsByStudySet(studySet.id, 0, 100);
+                            const tests = testsResponse.content || [];
+                            tests.forEach(test => {
+                                allTests.push({
+                                    ...test,
+                                    studySetName: studySet.name,
+                                    folderName: folder.folderName
+                                });
+                            });
+                        } catch (e) {}
+                    }
+                } catch (e) {}
+            }
+            updateStats();
+            renderHistory();
+            return allTests;
+        }
+
+        function updateStats() {
+            const totalTests = allTests.length;
+            const avgScore = totalTests > 0 
+                ? Math.round(allTests.reduce((sum, t) => sum + (t.successPercent || 0), 0) / totalTests)
+                : 0;
+            const bestScore = totalTests > 0
+                ? Math.max(...allTests.map(t => t.successPercent || 0))
+                : 0;
+            document.getElementById('total-tests').textContent = totalTests;
+            document.getElementById('avg-score').textContent = avgScore + '%';
+            document.getElementById('best-score').textContent = bestScore + '%';
+            document.getElementById('streak').textContent = calculateStreak();
+        }
+
+        function calculateStreak() {
+            return allTests.length > 0 ? Math.min(allTests.length, 7) : 0;
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-list');
+            if (allTests.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+                        <h5>Chưa có bài kiểm tra nào</h5>
+                        <p>Hãy làm quiz từ các bộ flashcard để xem lịch sử tại đây</p>
+                        <a href="folders.html" class="btn btn-primary mt-2">
+                            <i class="fas fa-folder me-2"></i>Xem thư mục
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            const sortedTests = [...allTests].sort((a, b) => b.id - a.id);
+            container.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Tên bài kiểm tra</th>
+                                <th>Bộ học</th>
+                                <th>Điểm số</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sortedTests.map((test, index) => {
+                                const scoreClass = getScoreClass(test.successPercent);
+                                return `
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td><strong>${test.name || 'Bài kiểm tra #' + test.id}</strong></td>
+                                        <td>
+                                            <span class="text-muted">
+                                                <i class="fas fa-layer-group me-1"></i>
+                                                ${test.studySetName || 'N/A'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge ${scoreClass}">
+                                                ${test.successPercent || 0}%
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewTestDetail(${test.id})">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-success" onclick="retakeTest(${test.studySetId})">
+                                                <i class="fas fa-redo"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function getScoreClass(score) {
+            if (score >= 80) return 'bg-success-subtle text-success fw-bold';
+            if (score >= 60) return 'bg-primary-subtle text-primary fw-bold';
+            if (score >= 40) return 'bg-warning-subtle text-warning fw-bold';
+            return 'bg-danger-subtle text-danger fw-bold';
+        }
+
+        function viewTestDetail(testId) {
+            Utils.info('Tính năng xem chi tiết đang được phát triển');
+        }
+
+        function retakeTest(studySetId) {
+            if (studySetId) {
+                window.location.href = `quiz.html?studySetId=${studySetId}`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nâng cấp VIP - FlashCard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <style>
+        .vip-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .vip-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .vip-hero .crown-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .pricing-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .pricing-card.featured {
+            border-color: #667eea;
+            position: relative;
+        }
+        
+        .pricing-card.featured::before {
+            content: 'PHỔ BIẾN';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .pricing-card .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        
+        .pricing-card .price span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #64748b;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-list li i {
+            color: #10b981;
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        .feature-list li.disabled {
+            color: #94a3b8;
+        }
+        
+        .feature-list li.disabled i {
+            color: #cbd5e1;
+        }
+        
+        .btn-vip {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 40px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-vip:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .btn-vip:disabled {
+            opacity: 0.7;
+            transform: none;
+        }
+        
+        .bank-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        
+        .bank-option {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        .bank-option:hover {
+            border-color: #667eea;
+        }
+        
+        .bank-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .bank-option img {
+            height: 30px;
+        }
+        
+        .vip-benefits {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 2rem;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        
+        .benefit-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+        }
+        
+        .current-status {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .current-status.not-vip {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar-container"></div>
+    <div id="sidebar-container"></div>
+    
+    <main class="main-content">
+        <div class="container-fluid">
+            <!-- VIP Hero -->
+            <div class="vip-hero">
+                <div class="crown-icon">👑</div>
+                <h1>Nâng cấp VIP</h1>
+                <p class="mb-0 opacity-75">Mở khóa tất cả tính năng và học tập không giới hạn</p>
+            </div>
+            
+            <!-- Current Status -->
+            <div id="current-status" class="current-status not-vip">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-1"><i class="fas fa-user me-2"></i>Trạng thái hiện tại</h5>
+                        <p class="mb-0" id="status-text">Đang kiểm tra...</p>
+                    </div>
+                    <div id="status-badge">
+                        <span class="badge bg-secondary fs-6">FREE</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <!-- Free Plan -->
+                <div class="col-md-6">
+                    <div class="pricing-card h-100">
+                        <h3 class="mb-3">Miễn phí</h3>
+                        <div class="price">0đ <span>/ mãi mãi</span></div>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Tạo thư mục và bộ học</li>
+                            <li><i class="fas fa-check"></i> Tạo flashcard không giới hạn</li>
+                            <li><i class="fas fa-check"></i> Chế độ học cơ bản</li>
+                            <li><i class="fas fa-check"></i> Tham gia lớp học</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Làm Quiz kiểm tra</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Xem lịch sử kiểm tra</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Thống kê chi tiết</li>
+                        </ul>
+                        <button class="btn btn-outline-secondary w-100" disabled>
+                            Gói hiện tại
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- VIP Plan -->
+                <div class="col-md-6">
+                    <div class="pricing-card featured h-100">
+                        <h3 class="mb-3">
+                            <i class="fas fa-crown text-warning me-2"></i>VIP
+                        </h3>
+                        <div class="price">300.000đ <span>/ 30 ngày</span></div>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Tất cả tính năng miễn phí</li>
+                            <li><i class="fas fa-check"></i> <strong>Làm Quiz kiểm tra</strong></li>
+                            <li><i class="fas fa-check"></i> <strong>Xem lịch sử kiểm tra</strong></li>
+                            <li><i class="fas fa-check"></i> <strong>Thống kê học tập chi tiết</strong></li>
+                            <li><i class="fas fa-check"></i> Hỗ trợ ưu tiên</li>
+                            <li><i class="fas fa-check"></i> Không quảng cáo</li>
+                        </ul>
+                        
+                        <!-- Bank Selection -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Chọn ngân hàng:</label>
+                            <div class="bank-select">
+                                <div class="bank-option selected" data-bank="NCB" onclick="selectBank(this)">
+                                    <span class="fw-bold">NCB</span>
+                                </div>
+                                <div class="bank-option" data-bank="VNPAY" onclick="selectBank(this)">
+                                    <span class="fw-bold">VNPay QR</span>
+                                </div>
+                                <div class="bank-option" data-bank="VNBANK" onclick="selectBank(this)">
+                                    <span class="fw-bold">Nội địa</span>
+                                </div>
+                                <div class="bank-option" data-bank="INTCARD" onclick="selectBank(this)">
+                                    <span class="fw-bold">Visa/Master</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-vip w-100" id="btn-upgrade" onclick="upgradeVip()">
+                            <i class="fas fa-bolt me-2"></i>Nâng cấp ngay
+                        </button>
+                        
+                        <p class="text-muted small mt-3 mb-0">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Thanh toán an toàn qua VNPay
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- VIP Benefits -->
+            <div class="vip-benefits mt-4">
+                <h4 class="mb-4 text-center">
+                    <i class="fas fa-star text-warning me-2"></i>
+                    Quyền lợi VIP
+                </h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="benefit-item">
+                            <div class="benefit-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Làm Quiz không giới hạn</h6>
+                                <p class="text-muted small mb-0">Kiểm tra kiến thức với các bài quiz được tạo tự động</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="benefit-item">
+                            <div class="benefit-icon bg-success bg-opacity-10 text-success">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Thống kê chi tiết</h6>
+                                <p class="text-muted small mb-0">Theo dõi tiến độ học tập và điểm số qua thời gian</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="benefit-item">
+                            <div class="benefit-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Lịch sử kiểm tra</h6>
+                                <p class="text-muted small mb-0">Xem lại kết quả các bài kiểm tra đã làm</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Payment History -->
+            <div class="card-custom mt-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-history me-2"></i>Lịch sử thanh toán
+                    </h5>
+                    <div id="payment-history">
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-receipt mb-2" style="font-size: 2rem;"></i>
+                            <p class="mb-0">Chưa có giao dịch nào</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Loading Modal -->
+    <div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content text-center py-4">
+                <div class="spinner-border text-primary mb-3" role="status"></div>
+                <p class="mb-0">Đang xử lý thanh toán...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+    
+    <script>
+        let selectedBank = 'NCB';
+        let loadingModal;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!Utils.requireAuth()) return;
+            
+            loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+            
+            await checkVipStatus();
+            await loadPaymentHistory();
+        });
+        
+        async function checkVipStatus() {
+            try {
+                const response = await API.getYourVipHistory(0, 1);
+                const vipHistory = response.content || [];
+                
+                // Tìm gói VIP còn hiệu lực
+                const activeVip = vipHistory.find(v => {
+                    if (v.status !== 'success') return false;
+                    const expiredDate = new Date(v.expired);
+                    return expiredDate > new Date();
+                });
+                
+                const statusEl = document.getElementById('current-status');
+                const statusText = document.getElementById('status-text');
+                const statusBadge = document.getElementById('status-badge');
+                const btnUpgrade = document.getElementById('btn-upgrade');
+                
+                if (activeVip) {
+                    const expiredDate = new Date(activeVip.expired);
+                    statusEl.classList.remove('not-vip');
+                    statusText.innerHTML = `VIP còn hiệu lực đến: <strong>${expiredDate.toLocaleDateString('vi-VN')}</strong>`;
+                    statusBadge.innerHTML = '<span class="badge bg-warning fs-6"><i class="fas fa-crown me-1"></i>VIP</span>';
+                    btnUpgrade.innerHTML = '<i class="fas fa-sync me-2"></i>Gia hạn VIP';
+                } else {
+                    statusText.textContent = 'Bạn chưa có gói VIP';
+                }
+                
+            } catch (error) {
+                console.error('Error checking VIP status:', error);
+                document.getElementById('status-text').textContent = 'Bạn chưa có gói VIP';
+            }
+        }
+        
+        async function loadPaymentHistory() {
+            try {
+                const response = await API.getYourVipHistory(0, 10);
+                const history = response.content || [];
+                
+                const container = document.getElementById('payment-history');
+                
+                if (history.length === 0) {
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Số tiền</th>
+                                    <th>Hạn sử dụng</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${history.map(item => `
+                                    <tr>
+                                        <td>${new Date(item.expired).toLocaleDateString('vi-VN')}</td>
+                                        <td>${(item.payValue || 300000).toLocaleString('vi-VN')}đ</td>
+                                        <td>${new Date(item.expired).toLocaleDateString('vi-VN')}</td>
+                                        <td>
+                                            ${item.status === 'success' 
+                                                ? '<span class="badge bg-success">Thành công</span>'
+                                                : item.status === 'pending'
+                                                ? '<span class="badge bg-warning">Đang xử lý</span>'
+                                                : '<span class="badge bg-danger">Thất bại</span>'
+                                            }
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error loading payment history:', error);
+            }
+        }
+        
+        function selectBank(element) {
+            document.querySelectorAll('.bank-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedBank = element.dataset.bank;
+        }
+        
+        async function upgradeVip() {
+            const btn = document.getElementById('btn-upgrade');
+            btn.disabled = true;
+            loadingModal.show();
+            
+            try {
+                // Gửi request tạo thanh toán VNPay
+                const response = await fetch(CONFIG.API_BASE_URL + '/VnPay/pay', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + API.getToken()
+                    },
+                    body: JSON.stringify({
+                        bankCode: selectedBank,
+                        locale: 'vn'
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'Không thể tạo thanh toán');
+                }
+                
+                // Response là URL thanh toán VNPay
+                const paymentUrl = await response.text();
+                
+                if (paymentUrl && paymentUrl.startsWith('http')) {
+                    // Chuyển hướng đến trang thanh toán VNPay
+                    window.location.href = paymentUrl;
+                } else {
+                    throw new Error('URL thanh toán không hợp lệ');
+                }
+                
+            } catch (error) {
+                console.error('Payment error:', error);
+                loadingModal.hide();
+                Utils.error(error.message || 'Không thể tạo thanh toán. Vui lòng thử lại!');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

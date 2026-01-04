@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả thanh toán - FlashCard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        
+        .result-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 3rem;
+        }
+        
+        .result-icon.success {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .result-icon.failed {
+            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            color: white;
+        }
+        
+        .result-icon.processing {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .result-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-title.success { color: #10b981; }
+        .result-title.failed { color: #ef4444; }
+        .result-title.processing { color: #f59e0b; }
+        
+        .result-message {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+        
+        .transaction-info {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        
+        .transaction-info .row {
+            margin-bottom: 0.5rem;
+        }
+        
+        .transaction-info .label {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+        
+        .transaction-info .value {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .btn-dashboard {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 14px 40px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-dashboard:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .btn-outline-custom {
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: #64748b;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-custom:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="result-card" id="result-card">
+        <!-- Loading State -->
+        <div id="loading-state">
+            <div class="loading-spinner">
+                <div class="spinner mb-3"></div>
+                <h4>Đang xử lý kết quả...</h4>
+                <p class="text-muted">Vui lòng đợi trong giây lát</p>
+            </div>
+        </div>
+        
+        <!-- Success State -->
+        <div id="success-state" style="display: none;">
+            <div class="result-icon success">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2 class="result-title success">Thanh toán thành công!</h2>
+            <p class="result-message">
+                Chúc mừng! Bạn đã nâng cấp lên tài khoản VIP thành công. 
+                Bây giờ bạn có thể sử dụng tất cả tính năng premium.
+            </p>
+            <div class="transaction-info">
+                <div class="row">
+                    <div class="col-6 label">Mã giao dịch:</div>
+                    <div class="col-6 value" id="txn-id">-</div>
+                </div>
+                <div class="row">
+                    <div class="col-6 label">Số tiền:</div>
+                    <div class="col-6 value" id="txn-amount">300.000đ</div>
+                </div>
+                <div class="row">
+                    <div class="col-6 label">Thời hạn VIP:</div>
+                    <div class="col-6 value">30 ngày</div>
+                </div>
+            </div>
+            <div class="d-flex flex-column gap-2">
+                <a href="dashboard.html" class="btn-dashboard">
+                    <i class="fas fa-home me-2"></i>Về trang chủ
+                </a>
+                <a href="vip.html" class="btn-outline-custom">
+                    Xem thông tin VIP
+                </a>
+            </div>
+        </div>
+        
+        <!-- Failed State -->
+        <div id="failed-state" style="display: none;">
+            <div class="result-icon failed">
+                <i class="fas fa-times"></i>
+            </div>
+            <h2 class="result-title failed">Thanh toán thất bại</h2>
+            <p class="result-message" id="error-message">
+                Rất tiếc, giao dịch của bạn không thành công. 
+                Vui lòng thử lại hoặc liên hệ hỗ trợ nếu vấn đề tiếp tục.
+            </p>
+            <div class="transaction-info">
+                <div class="row">
+                    <div class="col-6 label">Mã giao dịch:</div>
+                    <div class="col-6 value" id="failed-txn-id">-</div>
+                </div>
+                <div class="row">
+                    <div class="col-6 label">Mã lỗi:</div>
+                    <div class="col-6 value" id="error-code">-</div>
+                </div>
+            </div>
+            <div class="d-flex flex-column gap-2">
+                <a href="vip.html" class="btn-dashboard">
+                    <i class="fas fa-redo me-2"></i>Thử lại
+                </a>
+                <a href="dashboard.html" class="btn-outline-custom">
+                    <i class="fas fa-home me-2"></i>Về trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confetti for success -->
+    <div class="confetti" id="confetti"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lấy tất cả params từ URL
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            console.log('All URL params:', Object.fromEntries(urlParams.entries()));
+            
+            // Kiểm tra có params không
+            if (urlParams.toString() === '') {
+                showError('Không có thông tin thanh toán', 'NO_PARAMS');
+                return;
+            }
+            
+            // Kiểm tra status từ backend (backend đã xử lý và redirect về đây)
+            const status = urlParams.get('status');
+            const vnpResponseCode = urlParams.get('vnp_ResponseCode');
+            const vnpTxnRef = urlParams.get('vnp_TxnRef');
+            const vnpAmount = urlParams.get('vnp_Amount');
+            
+            // Xử lý kết quả
+            if (status === 'success' || vnpResponseCode === '00') {
+                // Thanh toán thành công
+                showSuccess({
+                    vnp_TxnRef: vnpTxnRef,
+                    vnp_Amount: vnpAmount
+                });
+            } else if (status === 'fail' || status === 'error' || vnpResponseCode) {
+                // Thanh toán thất bại
+                const message = urlParams.get('message') || getErrorMessage(vnpResponseCode);
+                showError(message, vnpResponseCode || 'UNKNOWN');
+            } else {
+                // Không xác định được kết quả
+                showError('Không thể xác định kết quả thanh toán', 'UNKNOWN');
+            }
+        });
+        
+        function getErrorMessage(code) {
+            const errorMessages = {
+                '07': 'Trừ tiền thành công nhưng giao dịch bị nghi ngờ',
+                '09': 'Thẻ/Tài khoản chưa đăng ký Internet Banking',
+                '10': 'Xác thực thông tin thẻ/tài khoản không đúng quá 3 lần',
+                '11': 'Đã hết hạn chờ thanh toán',
+                '12': 'Thẻ/Tài khoản bị khóa',
+                '13': 'Nhập sai mật khẩu xác thực (OTP)',
+                '24': 'Khách hàng hủy giao dịch',
+                '51': 'Tài khoản không đủ số dư',
+                '65': 'Tài khoản đã vượt quá hạn mức giao dịch trong ngày',
+                '75': 'Ngân hàng thanh toán đang bảo trì',
+                '79': 'Nhập sai mật khẩu thanh toán quá số lần quy định',
+                '99': 'Lỗi không xác định'
+            };
+            return errorMessages[code] || 'Thanh toán không thành công';
+        }
+        
+        function showSuccess(params) {
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('success-state').style.display = 'block';
+            document.getElementById('failed-state').style.display = 'none';
+            
+            // Hiển thị thông tin giao dịch
+            if (params.vnp_TxnRef) {
+                document.getElementById('txn-id').textContent = params.vnp_TxnRef;
+            }
+            
+            if (params.vnp_Amount) {
+                const amount = parseInt(params.vnp_Amount) / 100;
+                document.getElementById('txn-amount').textContent = amount.toLocaleString('vi-VN') + 'đ';
+            }
+            
+            // Hiệu ứng confetti
+            createConfetti();
+        }
+        
+        function showError(message, code) {
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('success-state').style.display = 'none';
+            document.getElementById('failed-state').style.display = 'block';
+            
+            if (message) {
+                document.getElementById('error-message').textContent = message;
+            }
+            
+            if (code) {
+                document.getElementById('error-code').textContent = code;
+                document.getElementById('failed-txn-id').textContent = 
+                    new URLSearchParams(window.location.search).get('vnp_TxnRef') || '-';
+            }
+            
+            // Map VNPay response codes
+            const errorMessages = {
+                '07': 'Trừ tiền thành công nhưng giao dịch bị nghi ngờ',
+                '09': 'Thẻ/Tài khoản chưa đăng ký Internet Banking',
+                '10': 'Xác thực thông tin thẻ/tài khoản không đúng quá 3 lần',
+                '11': 'Đã hết hạn chờ thanh toán',
+                '12': 'Thẻ/Tài khoản bị khóa',
+                '13': 'Nhập sai mật khẩu xác thực (OTP)',
+                '24': 'Khách hàng hủy giao dịch',
+                '51': 'Tài khoản không đủ số dư',
+                '65': 'Tài khoản đã vượt quá hạn mức giao dịch trong ngày',
+                '75': 'Ngân hàng thanh toán đang bảo trì',
+                '79': 'Nhập sai mật khẩu thanh toán quá số lần quy định',
+                '99': 'Lỗi không xác định'
+            };
+            
+            if (errorMessages[code]) {
+                document.getElementById('error-message').textContent = errorMessages[code];
+            }
+        }
+        
+        function createConfetti() {
+            const confettiContainer = document.getElementById('confetti');
+            const colors = ['#667eea', '#764ba2', '#10b981', '#f59e0b', '#ef4444', '#3b82f6'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.cssText = `
+                    position: absolute;
+                    width: ${Math.random() * 10 + 5}px;
+                    height: ${Math.random() * 10 + 5}px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    left: ${Math.random() * 100}%;
+                    top: -20px;
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                    animation: fall ${Math.random() * 3 + 2}s linear forwards;
+                    animation-delay: ${Math.random() * 2}s;
+                `;
+                confettiContainer.appendChild(confetti);
+            }
+            
+            // Add keyframes
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fall {
+                    to {
+                        transform: translateY(100vh) rotate(720deg);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Remove confetti after animation
+            setTimeout(() => {
+                confettiContainer.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
