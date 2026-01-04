@@ -50,6 +50,14 @@ public class StudySetController {
     public ResponseEntity<?> search(@RequestParam("name") String name) {
         return ResponseEntity.ok(service.searchByName(name));
     }
+    @GetMapping("/your-sets")
+    public ResponseEntity<?> getYourStudySets(Pageable pageable) {
+        try {
+            return ResponseEntity.ok(service.getYourStudySets(pageable));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
+    }
     @DeleteMapping("/delete")
     public ResponseEntity<?> delete(@RequestParam("id") Integer id) {
         try {

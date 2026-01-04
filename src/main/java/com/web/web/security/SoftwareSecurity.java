@@ -55,8 +55,8 @@ public class SoftwareSecurity implements WebMvcConfigurer {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth->auth
                         .requestMatchers("/user/signin","/user/register","/user/confirmRegister","/user/resetPassword",
-                        "/user/confirmResetPassword")
-                        .permitAll()
+                        "/user/confirmResetPassword").permitAll()
+                        .requestMatchers("/studySetItem/**", "/textbook/**", "/static/**").permitAll()
                         .requestMatchers("/user/findById" ,"/user/findAll","/vipUser/findAll").hasRole("ADMIN")
                         .requestMatchers("/textBook/add","/Chapter/save","/Chapter/update").hasRole("EXPERT")
                         .anyRequest().authenticated())

@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ import com.web.web.entity.Folder;
 import com.web.web.entity.StudySet;
 import com.web.web.mapper.StudySetMapper;
 import com.web.web.repository.StudySetRepository;
+import com.web.web.repository.UserRepository;
+import com.web.web.entity.User;
 
 @Service
 public class StudySetService {
@@ -23,6 +26,9 @@ public class StudySetService {
     StudySetRepository studySetRepo;
     @Autowired
     StudySetMapper mapper;
+    @Autowired
+    UserRepository userRepo;
+
     public void create(Integer folderId,String name){
         folderService.checkIfYouCanAccessFolder(folderId);
         StudySet studySet=new StudySet(null,name,new Folder(folderId),null,null);
@@ -38,6 +44,18 @@ public class StudySetService {
         
         return studySetRepo.findByFolder(new Folder(folderId), null).map(mapper::toDTO);
     }
+
+    public Page<StudySetResponse> getYourStudySets(Pageable pageable) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        
+        User user = userRepo.findByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        return studySetRepo.findByUserId(user.getId(), pageable).map(mapper::toDTO);
+    }
+
     public List<StudySetResponse> searchByName(String name) {
     return studySetRepo.findByNameContaining(name).stream()
             .map(s -> mapper.toDTO(s))

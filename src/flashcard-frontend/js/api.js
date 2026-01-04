@@ -298,6 +298,10 @@ const API = {
         return this.get(CONFIG.API.STUDYSET_FIND_BY_FOLDER, { folderId, page, size });
     },
 
+    async getYourStudySets(page = 0, size = 10) {
+        return this.get('/studySet/your-sets', { page, size });
+    },
+
     async searchStudySets(name) {
         return this.get(CONFIG.API.STUDYSET_SEARCH, { name });
     },
