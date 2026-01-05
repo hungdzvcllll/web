@@ -287,6 +287,8 @@
                 const classes = await API.getYourClasses(0, 1);
                 document.getElementById('stat-classes').textContent = classes.totalElements || 0;
                 
+                // Load study sets count
+                const studySets = await API.getYourStudySets(0, 1);
                 const count = studySets.totalElements !== undefined ? studySets.totalElements : (studySets.length || 0);
                 document.getElementById('stat-studysets').textContent = count;
             } catch (error) {

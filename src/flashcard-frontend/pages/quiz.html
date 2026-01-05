@@ -78,12 +78,15 @@
         document.addEventListener('DOMContentLoaded', async function() {
             if (!Utils.requireAuth()) return;
             
-            studySetId = Utils.getUrlParam('id');
+            studySetId = Utils.getUrlParam('id') || Utils.getUrlParam('studySetId');
+            
             if (!studySetId) {
                 Utils.error('Không tìm thấy bộ học');
                 window.location.href = 'folders.html';
                 return;
             }
+            
+            console.log('Loading quiz for studySetId:', studySetId);
             
             document.getElementById('btn-study').href = `study.html?id=${studySetId}`;
             
@@ -96,13 +99,16 @@
                 const data = await API.getStudySetById(studySetId);
                 document.getElementById('quiz-title').textContent = `Quiz: ${data.name}`;
             } catch (error) {
-                Utils.error('Không thể tải thông tin');
+                console.error('Error loading study set:', error);
+                Utils.error('Không thể tải thông tin bộ học');
             }
         }
         
         async function loadQuiz() {
             try {
+                console.log('Calling API.getQuiz with studySetId:', studySetId);
                 questions = await API.getQuiz(studySetId);
+                console.log('Quiz questions loaded:', questions);
                 
                 if (!questions || questions.length === 0) {
                     document.getElementById('quiz-content').innerHTML = `
@@ -122,8 +128,34 @@
                 answers = new Array(questions.length).fill(null);
                 renderQuestion();
             } catch (error) {
-                Utils.error(error.message || 'Không thể tải quiz');
-                document.getElementById('quiz-content').innerHTML = `<p class="text-center text-muted">${error.message}</p>`;
+                console.error('Error loading quiz:', error);
+                
+                // Kiểm tra nếu lỗi là do chưa có VIP
+                const errorMsg = error.message || '';
+                if (errorMsg.toLowerCase().includes('vip') || errorMsg.toLowerCase().includes('expired')) {
+                    document.getElementById('quiz-content').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon" style="color: #f59e0b;"><i class="fas fa-crown"></i></div>
+                            <h3>Tính năng VIP</h3>
+                            <p>Bạn cần nâng cấp VIP để làm Quiz</p>
+                            <a href="vip.html" class="btn btn-warning">
+                                <i class="fas fa-bolt me-1"></i> Nâng cấp VIP ngay
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('quiz-content').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                            <h3>Không thể tải quiz</h3>
+                            <p>${errorMsg || 'Đã xảy ra lỗi'}</p>
+                            <button class="btn btn-primary-custom" onclick="location.reload()">
+                                <i class="fas fa-redo me-1"></i> Thử lại
+                            </button>
+                        </div>
+                    `;
+                }
+                document.getElementById('quiz-progress').classList.add('d-none');
             }
         }
         
@@ -267,6 +299,154 @@
             .main-content {
                 margin-left: calc(260px + (100% - 260px - 800px) / 2);
             }
+        }
+        
+        .quiz-question-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .quiz-question-number {
+            font-size: 0.875rem;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quiz-question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 1.5rem;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .quiz-option:hover {
+            border-color: #667eea;
+            background: #f8faff;
+        }
+        
+        .quiz-option.selected {
+            border-color: #667eea;
+            background: #eff1ff;
+        }
+        
+        .quiz-option-letter {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #64748b;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .quiz-option.selected .quiz-option-letter {
+            background: #667eea;
+            color: white;
+        }
+        
+        .quiz-option-text {
+            flex: 1;
+            color: #334155;
+        }
+        
+        .quiz-progress {
+            margin-bottom: 2rem;
+        }
+        
+        .quiz-progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+        
+        .progress-custom {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .quiz-result {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .quiz-result-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .quiz-result-icon.success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .quiz-result-icon.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .quiz-result-icon.danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .quiz-result-score {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
         }
     </style>
 </body>
