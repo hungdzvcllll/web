@@ -268,6 +268,7 @@ public class VNPayUtils {
         long amount = (long)300000 *(long) 100;
         String vnp_TxnRef = getRandomNumber(8);
         String vnp_IpAddr = getIpAddress(req);
+    //    String vnp_IpAddr = "127.0.0.1";
 
         String vnp_TmnCode = vnPayConfig.getMerchantId();
 
@@ -294,8 +295,11 @@ public class VNPayUtils {
         vnp_Params.put("vnp_ReturnUrl", vnPayConfig.getReturnUrl());
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        TimeZone vnTimeZone = TimeZone.getTimeZone("Asia/Ho_Chi_Minh");
+        Calendar cld = Calendar.getInstance(vnTimeZone);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        formatter.setTimeZone(vnTimeZone);
+
         String vnp_CreateDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 

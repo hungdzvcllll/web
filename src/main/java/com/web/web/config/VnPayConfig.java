@@ -11,8 +11,8 @@ import lombok.Data;
 public class VnPayConfig {
     private String paymentUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     private String queryUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
-    private String merchantId = "H31DMJH0";
-    private String hashSecret = "W9BPCVFLQGUDBPG1WQA2CH8JWSINGGN6";
+    private String merchantId = "D9M6WNSL";
+    private String hashSecret = "8PVLJ4P1CY8O5QIVV7I63MVYCUMVME9T";
     private String returnUrl = "http://localhost:8081/VnPay/paymentResult";
     private String notifyUrl = "http://localhost:8083/api/payment/vnpay/notify";
     private String version = "2.1.0";

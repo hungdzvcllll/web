@@ -40,6 +40,19 @@ services:
       - "3000:80"
     depends_on:
       - backend
+#  
+#  phpmyadmin:
+#    image: phpmyadmin/phpmyadmin
+#    container_name: flashcard-phpmyadmin
+#    environment:
+#      PMA_HOST: db
+#      PMA_PORT: 3306
+#      PMA_USER: root
+#      PMA_PASSWORD: root
+#    ports:
+#      - "8080:80"
+#    depends_on:
+ #     - db
 
 volumes:
   db_data:
