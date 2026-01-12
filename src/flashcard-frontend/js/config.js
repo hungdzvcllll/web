@@ -6,8 +6,8 @@
 
 const CONFIG = {
     // API Base URL - thay đổi khi deploy
-    API_BASE_URL: 'http://localhost:8081',
-    
+    //API_BASE_URL: 'http://localhost:8081',
+    API_BASE_URL: 'https://flashcard-backend-app.onrender.com',  
     // API Endpoints
     API: {
         // Auth
