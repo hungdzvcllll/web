@@ -75,6 +75,5 @@ public class VnPayController {
             e.printStackTrace();
             response.sendRedirect(frontendUrl + "/pages/payment-result.html?status=fail&message=" + e.getMessage());
         }
-        }
     }
 }
