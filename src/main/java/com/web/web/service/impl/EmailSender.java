@@ -13,7 +13,7 @@ public class EmailSender implements EmailSenderInterface {
 
     public void sendEmail(String token, String email) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("bui269952@gmail.com");
+        message.setFrom("maobeo111@gmail.com");
         message.setTo(email);
         message.setSubject("Xac nhan dang ky");
         message.setText(token);
