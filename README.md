@@ -204,6 +204,3 @@ Dưới đây là tổng hợp một số endpoints quan trọng được cung c
 - **Thuật toán lặp lại ngắt quãng (Spaced Repetition)**: Ứng dụng thuật toán SuperMemo (SM-2) để tối ưu lịch ôn tập từng từ theo năng lực ghi nhớ của người học.
 - **Ứng dụng di động**: Xây dựng phiên bản Mobile App (React Native / Flutter) đồng bộ dữ liệu với Backend.
 - **Trí tuệ nhân tạo (AI Assistant)**: Tự động trích xuất từ vựng, tóm tắt và sinh flashcards tự động từ tài liệu PDF bằng LLM API.
-```
-
-File `README.md` trên đã được cấu trúc và đồng bộ hóa tương thích toàn bộ thông tin mã nguồn dự án của bạn (Spring Boot, DTO/Mapper, Entity, Security JWT, VNPAY, Web Frontend, Docker). Bạn có thể đặt trực tiếp file này vào thư mục gốc của repository dự án.
