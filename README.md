@@ -21,12 +21,6 @@ Hệ thống được thiết kế theo kiến trúc chuẩn RESTful API với B
 - **Hệ thống thông báo (Notification)**: Cập nhật thông báo hệ thống, thông báo lớp học theo thời gian thực tới từng người dùng.
 - **Đóng gói Docker**: Triển khai nhanh chóng cả ứng dụng và cơ sở dữ liệu thông qua Docker & Docker Compose.
 
-- Hình ảnh tổng quan hệ thống:
-<div align="center">
-  <img src="docs/dashboard_preview.png" width="700" alt="Giao diện tổng quan hệ thống"/>
-</div>
-<p align="center"><em>Hình 1: Giao diện tổng quan màn hình Dashboard hệ thống</em></p>
-
 ## KIẾN TRÚC HỆ THỐNG
 
 Hệ thống bao gồm 2 thành phần chính hoạt động độc lập và giao tiếp thông qua giao thức HTTP/JSON:
@@ -77,12 +71,6 @@ flashcard-system/
 └── docs/                                 # Tài liệu kiến trúc và hình ảnh minh họa
 ```
 
-- Sơ đồ luồng dữ liệu tổng quan:
-<div align="center">
-  <img src="docs/system_architecture.png" width="700" alt="Sơ đồ luồng dữ liệu tổng quan"/>
-</div>
-<p align="center"><em>Hình 2: Sơ đồ tương tác dữ liệu giữa Frontend, Backend và Dịch vụ bên ngoài</em></p>
-
 ## CƠ SỞ DỮ LIỆU (DATABASE SCHEMA)
 
 Cơ sở dữ liệu của hệ thống được chuẩn hóa bao gồm các bảng thực thể và bảng quan hệ liên kết:
@@ -101,12 +89,6 @@ Cơ sở dữ liệu của hệ thống được chuẩn hóa bao gồm các b�
 | `Chapter` | Các chương mục trong sách giáo trình | `id`, `title`, `orderIndex`, `textBookId` |
 | `Test` | Đề kiểm tra và câu hỏi trắc nghiệm | `id`, `title`, `duration`, `studySetId` |
 | `Notification` | Thông báo gửi tới tài khoản người dùng | `id`, `userId`, `content`, `isRead`, `createdAt` |
-
-- Sơ đồ thực thể liên kết (ERD):
-<div align="center">
-  <img src="docs/erd_diagram.png" width="700" alt="Sơ đồ quan hệ thực thể ERD"/>
-</div>
-<p align="center"><em>Hình 3: Sơ đồ ERD cơ sở dữ liệu của hệ thống</em></p>
 
 ## HƯỚNG DẪN CÀI ĐẶT VÀ CHẠY THỬ
 
